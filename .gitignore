@@ -1,0 +1,6 @@
+*
+!.gitignore
+!devices-reference
+!devices-community
+!kernel/Android.mk
+
