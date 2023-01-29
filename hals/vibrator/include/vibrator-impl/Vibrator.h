@@ -57,10 +57,10 @@ class Vibrator : public BnVibrator {
     ndk::ScopedAStatus composePwle(const std::vector<PrimitivePwle> &composite,
                                    const std::shared_ptr<IVibratorCallback> &callback) override;
 
-    std::unique_ptr<FFDevice> ff_device;
+    std::unique_ptr<FFDeviceBase> ff_device;
 
   public:
-    Vibrator(std::unique_ptr<FFDevice> ff_device) : ff_device(std::move(ff_device)) {}
+    Vibrator(std::unique_ptr<FFDeviceBase> ff_device) : ff_device(std::move(ff_device)) {}
 };
 
 }  // namespace vibrator

@@ -27,7 +27,7 @@ namespace android {
 namespace hardware {
 namespace vibrator {
 
-std::unique_ptr<FFDevice> FFDevice::create(const char* input_path) {
+std::unique_ptr<FFDeviceBase> FFDevice::create(const char* input_path) {
     auto observe_func = [](std::string_view path, std::string& event_path) -> bool {
         if (path.find("event") != std::string::npos) {
             event_path = path.data();

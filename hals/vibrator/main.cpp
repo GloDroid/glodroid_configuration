@@ -21,6 +21,8 @@
 #include "vibrator-impl/Vibrator.h"
 
 using aidl::android::hardware::vibrator::FFDevice;
+using aidl::android::hardware::vibrator::FFDeviceBase;
+using aidl::android::hardware::vibrator::FFDeviceDummy;
 using aidl::android::hardware::vibrator::Vibrator;
 
 static const char* INPUT_PATH = "/sys/devices/platform/vibrator/input";
@@ -28,8 +30,11 @@ static const char* INPUT_PATH = "/sys/devices/platform/vibrator/input";
 int main() {
     ABinderProcess_setThreadPoolMaxThreadCount(0);
     auto device = FFDevice::create(INPUT_PATH);
-    if (!device)
-        return EXIT_FAILURE;
+    if (!device) {
+        LOG(WARNING) << "Failed to create FFDevice, using dummy";
+        device = FFDeviceDummy::create();
+    }
+    CHECK(device);
     std::shared_ptr<Vibrator> vib = ndk::SharedRefBase::make<Vibrator>(std::move(device));
 
     const std::string instance = std::string() + Vibrator::descriptor + "/default";
