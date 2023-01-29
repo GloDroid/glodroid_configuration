@@ -1,32 +1,33 @@
+CBC_LOCAL_PATH := $(patsubst $(CURDIR)/%,%,$(dir $(abspath $(lastword $(MAKEFILE_LIST)))))
 
-include glodroid/configuration/common/base/board.mk
+include $(CBC_LOCAL_PATH)/base/board.mk
 
-include glodroid/configuration/common/other-hals/board.mk
+include $(CBC_LOCAL_PATH)/other-hals/board.mk
 
 ifeq ($(GD_NO_DEFAULT_BLUETOOTH),)
-include glodroid/configuration/common/bluetooth/board.mk
+include $(CBC_LOCAL_PATH)/bluetooth/board.mk
 endif
 
 ifeq ($(GD_NO_DEFAULT_GRAPHICS),)
-include glodroid/configuration/common/graphics/board.mk
+include $(CBC_LOCAL_PATH)/graphics/board.mk
 endif
 
 ifeq ($(GD_NO_DEFAULT_CODECS),)
-include glodroid/configuration/common/codecs/board.mk
+include $(CBC_LOCAL_PATH)/codecs/board.mk
 endif
 
 ifeq ($(GD_NO_DEFAULT_CAMERA),)
-include glodroid/configuration/common/camera/board.mk
+include $(CBC_LOCAL_PATH)/camera/board.mk
 endif
 
 ifeq ($(GD_NO_DEFAULT_MODEM),)
-include glodroid/configuration/common/modem/board.mk
+include $(CBC_LOCAL_PATH)/modem/board.mk
 endif
 
 ifeq ($(GD_NO_DEFAULT_AUDIO),)
-include glodroid/configuration/common/audio/board.mk
+include $(CBC_LOCAL_PATH)/audio/board.mk
 endif
 
 ifeq ($(GD_NO_DEFAULT_WIFI),)
-include glodroid/configuration/common/wifi/board.mk
+include $(CBC_LOCAL_PATH)/wifi/board.mk
 endif

@@ -4,6 +4,8 @@
 #
 # Copyright (C) 2022 Roman Stratiienko (r.stratiienko@gmail.com)
 
+BCG_PATH := $(patsubst $(CURDIR)/%,%,$(dir $(abspath $(lastword $(MAKEFILE_LIST)))))
+
 # AOSPEXT configuration
 BOARD_BUILD_AOSPEXT_MESA3D := true
 BOARD_MESA3D_SRC_DIR := glodroid/vendor/mesa3d
@@ -19,8 +21,8 @@ BOARD_MINIGBM_SRC_DIR := glodroid/vendor/minigbm
 BOARD_MINIGBM_PATCHES_DIRS += glodroid/configuration/patches/vendor/minigbm
 
 DEVICE_MANIFEST_FILE += \
-    glodroid/configuration/common/graphics/android.hardware.graphics.allocator@4.0.xml \
-    glodroid/configuration/common/graphics/android.hardware.graphics.mapper@4.0.xml \
-    glodroid/configuration/common/graphics/android.hardware.graphics.composer@2.4.xml \
+    $(BCG_PATH)/android.hardware.graphics.allocator@4.0.xml \
+    $(BCG_PATH)/android.hardware.graphics.mapper@4.0.xml \
+    $(BCG_PATH)/android.hardware.graphics.composer@2.4.xml \
 
-BOARD_VENDOR_SEPOLICY_DIRS       += glodroid/configuration/common/graphics/sepolicy/vendor
+BOARD_VENDOR_SEPOLICY_DIRS       += $(BCG_PATH)/sepolicy/vendor

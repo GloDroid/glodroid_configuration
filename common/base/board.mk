@@ -14,6 +14,8 @@
 # limitations under the License.
 #
 
+B_LOCAL_PATH := $(patsubst $(CURDIR)/%,%,$(dir $(abspath $(lastword $(MAKEFILE_LIST)))))
+
 include build/make/target/board/BoardConfigMainlineCommon.mk
 
 TARGET_NO_KERNEL := false
@@ -148,10 +150,10 @@ DEX_PREOPT_DEFAULT := nostripping
 WITH_DEXPREOPT := true
 ART_USE_HSPACE_COMPACT := true
 
-DEVICE_MATRIX_FILE := glodroid/configuration/common/base/compatibility_matrix.xml
+DEVICE_MATRIX_FILE := $(B_LOCAL_PATH)/compatibility_matrix.xml
 
 # SELinux support
-BOARD_VENDOR_SEPOLICY_DIRS       += glodroid/configuration/common/base/sepolicy/vendor
+BOARD_VENDOR_SEPOLICY_DIRS       += $(B_LOCAL_PATH)/sepolicy/vendor
 
 # Enable GloDroid-specific build targets
 BOARD_USES_GLODROID_MAKE_TARGETS := true

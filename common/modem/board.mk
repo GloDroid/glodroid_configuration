@@ -4,6 +4,8 @@
 #
 # Copyright (C) 2022 Roman Stratiienko (r.stratiienko@gmail.com)
 
+BCM_PATH := $(patsubst $(CURDIR)/%,%,$(dir $(abspath $(lastword $(MAKEFILE_LIST)))))
+
 BOARD_BUILD_AOSPEXT_DBUS := true
 BOARD_DBUS_SRC_DIR := glodroid/vendor/dbus
 
@@ -29,4 +31,4 @@ BOARD_MODEMMANAGER_PATCHES_DIRS := glodroid/configuration/patches/vendor/modemma
 BOARD_BUILD_AOSPEXT_MMRADIO := true
 BOARD_MMRADIO_SRC_DIR := glodroid/vendor/mm-radio
 
-BOARD_VENDOR_SEPOLICY_DIRS       += glodroid/configuration/common/modem/sepolicy/vendor
+BOARD_VENDOR_SEPOLICY_DIRS += $(BCM_PATH)/sepolicy/vendor
