@@ -174,15 +174,16 @@ $(PRODUCT_OUT)/bootloader-deploy-emmc.img $(PRODUCT_OUT)/bootloader-sd.img $(PRO
 endif
 
 ifeq ($(PRODUCT_BOARD_PLATFORM),broadcom)
+DTBS_DIR := $(PRODUCT_OUT)/obj/GLODROID/KERNEL/install/dtbs
 BOOT_FILES := \
     $(RPI_FIRMWARE_DIR)/boot/bootcode.bin \
     $(RPI_FIRMWARE_DIR)/boot/start_x.elf \
     $(RPI_FIRMWARE_DIR)/boot/start4x.elf \
     $(RPI_FIRMWARE_DIR)/boot/fixup_x.dat \
     $(RPI_FIRMWARE_DIR)/boot/fixup4x.dat \
-    $(PRODUCT_OUT)/obj/KERNEL_OBJ/arch/$(TARGET_ARCH)/boot/dts/broadcom/bcm2711-rpi-4-b.dtb \
-    $(PRODUCT_OUT)/obj/KERNEL_OBJ/arch/$(TARGET_ARCH)/boot/dts/broadcom/bcm2711-rpi-400.dtb \
-    $(PRODUCT_OUT)/obj/KERNEL_OBJ/arch/$(TARGET_ARCH)/boot/dts/broadcom/bcm2711-rpi-cm4.dtb \
+    $(DTBS_DIR)/broadcom/bcm2711-rpi-4-b.dtb \
+    $(DTBS_DIR)/broadcom/bcm2711-rpi-400.dtb \
+    $(DTBS_DIR)/broadcom/bcm2711-rpi-cm4.dtb \
 
 OVERLAY_FILES := $(sort $(shell find -L $(RPI_FIRMWARE_DIR)/boot/overlays))
 
