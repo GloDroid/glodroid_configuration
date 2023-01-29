@@ -1,0 +1,30 @@
+From 738408a8de8bb8f137667c35517443553dc65ebc Mon Sep 17 00:00:00 2001
+From: Roman Stratiienko <r.stratiienko@gmail.com>
+Date: Thu, 8 Apr 2021 16:46:52 +0300
+Subject: [PATCH] HACK: sun4i/drm: Add ABxx formats support to vi plane
+
+... to fit Android DRM_HWC CLIENT layer.
+
+Signed-off-by: Roman Stratiienko <r.stratiienko@gmail.com>
+---
+ drivers/gpu/drm/sun4i/sun8i_vi_layer.c | 4 ++++
+ 1 file changed, 4 insertions(+)
+
+diff --git a/drivers/gpu/drm/sun4i/sun8i_vi_layer.c b/drivers/gpu/drm/sun4i/sun8i_vi_layer.c
+index bb7c43036..a0d78dc79 100644
+--- a/drivers/gpu/drm/sun4i/sun8i_vi_layer.c
++++ b/drivers/gpu/drm/sun4i/sun8i_vi_layer.c
+@@ -487,6 +487,10 @@ static const u32 sun8i_vi_layer_formats[] = {
+ 	DRM_FORMAT_YVU411,
+ 	DRM_FORMAT_YVU420,
+ 	DRM_FORMAT_YVU422,
++
++	DRM_FORMAT_ABGR1555,
++	DRM_FORMAT_ABGR4444,
++	DRM_FORMAT_ABGR8888,
+ };
+ 
+ static const u32 sun8i_vi_layer_de3_formats[] = {
+-- 
+2.37.2
+
