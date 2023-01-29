@@ -26,7 +26,7 @@ BOARD_LIBQMI_SRC_DIR := glodroid/vendor/libqmi
 
 BOARD_BUILD_AOSPEXT_MODEMMANAGER := true
 BOARD_MODEMMANAGER_SRC_DIR := glodroid/vendor/modem_manager
-BOARD_MODEMMANAGER_PATCHES_DIRS := glodroid/configuration/patches/vendor/modemmanager
+BOARD_MODEMMANAGER_PATCHES_DIRS := $(BCM_PATH)/patches-modemmanager
 
 BOARD_BUILD_AOSPEXT_MMRADIO := true
 BOARD_MMRADIO_SRC_DIR := glodroid/vendor/mm-radio

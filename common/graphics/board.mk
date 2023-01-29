@@ -14,11 +14,11 @@ BOARD_MESA3D_BUILD_LIBGBM := true
 
 BOARD_BUILD_AOSPEXT_DRMHWCOMPOSER := true
 BOARD_DRMHWCOMPOSER_SRC_DIR := glodroid/vendor/drm_hwcomposer
-BOARD_DRMHWCOMPOSER_PATCHES_DIRS += glodroid/configuration/patches/vendor/drm_hwcomposer
+BOARD_DRMHWCOMPOSER_PATCHES_DIRS += $(BCG_PATH)/patches-drm_hwcomposer
 
 BOARD_BUILD_AOSPEXT_MINIGBM := true
 BOARD_MINIGBM_SRC_DIR := glodroid/vendor/minigbm
-BOARD_MINIGBM_PATCHES_DIRS += glodroid/configuration/patches/vendor/minigbm
+BOARD_MINIGBM_PATCHES_DIRS += $(BCG_PATH)/patches-minigbm
 
 DEVICE_MANIFEST_FILE += \
     $(BCG_PATH)/android.hardware.graphics.allocator@4.0.xml \
