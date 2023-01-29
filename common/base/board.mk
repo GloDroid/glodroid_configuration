@@ -118,12 +118,15 @@ BOARD_PREBUILT_DTBIMAGE_DIR := glodroid/configuration/platform/kernel
 BOARD_BOOT_HEADER_VERSION := 4
 ifeq ($(PRODUCT_BOARD_PLATFORM),sunxi)
 BOARD_KERNEL_BASE     := 0x40000000
+BOARD_KERNEL_SRC_DIR  ?= glodroid/kernel/common-android13-5.15-lts
 endif
 ifeq ($(PRODUCT_BOARD_PLATFORM),broadcom)
 BOARD_KERNEL_BASE     := 0x00000000
+BOARD_KERNEL_SRC_DIR  ?= glodroid/kernel/broadcom
 endif
 ifeq ($(PRODUCT_BOARD_PLATFORM),rockchip)
 BOARD_KERNEL_BASE     := 0x2000000
+BOARD_KERNEL_SRC_DIR  ?= glodroid/kernel/common-android13-5.15-lts
 endif
 BOARD_KERNEL_PAGESIZE := 4096
 BOARD_KERNEL_CMDLINE  := androidboot.hardware=$(TARGET_PRODUCT)
@@ -152,3 +155,5 @@ BOARD_VENDOR_SEPOLICY_DIRS       += glodroid/configuration/common/base/sepolicy/
 
 # Enable GloDroid-specific build targets
 BOARD_USES_GLODROID_MAKE_TARGETS := true
+
+BOARD_BUILD_GLODROID_KERNEL := true

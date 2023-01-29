@@ -1,102 +1,84 @@
 # Android makefile to build kernel as a part of Android build
 
-#-------------------------------------------------------------------------------
 LOCAL_PATH := $(call my-dir)
-#-------------------------------------------------------------------------------
-ifeq ($(TARGET_PREBUILT_KERNEL),)
 
-#-------------------------------------------------------------------------------
-ifeq ($(PRODUCT_BOARD_PLATFORM),sunxi)
-KERNEL_SRC		?= glodroid/kernel/stable
-endif
+GLODROID_PROJECT_NAME := KERNEL
 
-ifeq ($(PRODUCT_BOARD_PLATFORM),rockchip)
-KERNEL_SRC		?= glodroid/kernel/stable
-endif
+ifneq ($(BOARD_BUILD_GLODROID_KERNEL),)
 
-ifeq ($(PRODUCT_BOARD_PLATFORM),broadcom)
-KERNEL_SRC		?= glodroid/kernel/broadcom
-endif
+AOSP_ABSOLUTE_PATH := $(realpath .)
 
 KERNEL_FRAGMENTS	:= \
-    $(LOCAL_PATH)/android-base.config \
-    $(LOCAL_PATH)/android-recommended.config \
-    $(LOCAL_PATH)/android-extra.config \
-    $(KERNEL_FRAGMENTS)
+	$(LOCAL_PATH)/android-base.config        \
+	$(LOCAL_PATH)/android-recommended.config \
+	$(LOCAL_PATH)/android-extra.config       \
+	$(KERNEL_FRAGMENTS)
 
 ifeq ($(TARGET_ARCH),arm64)
 KERNEL_FRAGMENTS	+= \
-    $(LOCAL_PATH)/android-recommended-arm64.config \
-    $(LOCAL_PATH)/android-extra-arm64.config
+	$(LOCAL_PATH)/android-recommended-arm64.config \
+	$(LOCAL_PATH)/android-extra-arm64.config
 else
 KERNEL_FRAGMENTS	+= \
-    $(LOCAL_PATH)/android-recommended-arm.config \
-    $(LOCAL_PATH)/android-extra-arm.config
+	$(LOCAL_PATH)/android-recommended-arm.config \
+	$(LOCAL_PATH)/android-extra-arm.config
 endif
 
-KERNEL_OUT		:= $(PRODUCT_OUT)/obj/KERNEL_OBJ
-KERNEL_MODULES_OUT 	:= $(PRODUCT_OUT)/obj/KERNEL_MODULES
-KERNEL_VERSION_FILE     := $(KERNEL_OUT)/include/config/kernel.release
+KERNEL_OUT		:= $(PRODUCT_OUT)/obj/GLODROID/KERNEL
+KERNEL_TARGET		:= $(KERNEL_OUT)/install/kernel
+KERNEL_DTB_OUT		:= $(KERNEL_OUT)/install/dtbs
+
+KERNEL_SRC_FILES        := $(sort $(shell find -L $(BOARD_KERNEL_SRC_DIR) -not -path '*/\.git/*'))
+KERNEL_PATCHES := $(if $(BOARD_KERNEL_PATCHES_DIRS),$(sort $(shell find -L $(BOARD_KERNEL_PATCHES_DIRS) -not -path '*/\.*')))
+
+
+$(KERNEL_TARGET): RUST_BIN_DIR_ABS := $(if $(RUST_BIN_DIR),$(shell cd $(RUST_BIN_DIR) && pwd),$(HOME)/.cargo/bin)
+$(KERNEL_TARGET): LOCAL_PATH := $(LOCAL_PATH)
+$(KERNEL_TARGET): KERNEL_OUT := $(KERNEL_OUT)
+$(KERNEL_TARGET): KCONFIG_OUT_FRAGMENTS := $(foreach frag,$(KERNEL_FRAGMENTS),configs/$(notdir $(frag)))
+$(KERNEL_TARGET): KERNEL_PATCHES_DIRS := $(BOARD_KERNEL_PATCHES_DIRS)
+$(KERNEL_TARGET): $(KERNEL_DEFCONFIG) $(KERNEL_FRAGMENTS) $(KERNEL_SRC_FILES) $(KERNEL_PATCHES)
+	mkdir -p $(KERNEL_OUT)
+	mkdir -p $(KERNEL_OUT)/configs
+	cp $(KERNEL_FRAGMENTS) $(KERNEL_OUT)/configs/
+	cp $(KERNEL_DEFCONFIG) $(KERNEL_OUT)/configs/defconfig
+	cp $(LOCAL_PATH)/../tools/makefile_base.mk $(KERNEL_OUT)/Makefile
+	cp $(LOCAL_PATH)/../tools/makefile_kernel.mk $(KERNEL_OUT)/project_specific.mk
+	sed -i \
+		-e 's#\[PLACE_FOR_TARGET_ARCH\]#$(TARGET_ARCH)#g' \
+		-e 's#\[PLACE_FOR_AOSP_ROOT\]#$(AOSP_ABSOLUTE_PATH)#g' \
+		-e 's#\[PLACE_FOR_SRC_DIR\]#$(BOARD_KERNEL_SRC_DIR)#g' \
+		-e 's#\[PLACE_FOR_PATCHES_DIRS\]#$(KERNEL_PATCHES_DIRS)#g' \
+		-e 's#\[PLACE_FOR_OUT_BASE_DIR\]#$(dir $(MESON_GEN_DIR))#g' \
+		$(KERNEL_OUT)/Makefile
+
+	sed -i \
+		-e 's#\[PLACE_FOR_KCONFIG_FRAGMENTS\]#$(KCONFIG_OUT_FRAGMENTS)#g' \
+		$(KERNEL_OUT)/project_specific.mk
+
+# Disable interposer and use LLVM compiler toolchain from AOSP tree
+	export ETC$$(cat /etc/environment) && export PATH=$(AOSP_ABSOLUTE_PATH)/$(LLVM_PREBUILTS_PATH):$(RUST_BIN_DIR_ABS):$$ETCPATH:$$PATH && make -C $(KERNEL_OUT) install
+
+# Post processing:
+
 TARGET_VENDOR_MODULES   := $(TARGET_OUT_VENDOR_DLKM)/lib/modules
-
-KERNEL_BOOT_DIR		:= arch/$(TARGET_ARCH)/boot
-ifeq ($(TARGET_ARCH),arm64)
-KERNEL_TARGET		:= Image
-else
-KERNEL_TARGET		:= zImage
-endif
-KERNEL_BINARY		:= $(KERNEL_OUT)/$(KERNEL_BOOT_DIR)/$(KERNEL_TARGET)
-KERNEL_COMPRESSED	:= $(KERNEL_OUT)/$(KERNEL_BOOT_DIR)/Image.lz4
-ifeq ($(TARGET_ARCH),arm64)
-KERNEL_IMAGE		:= $(KERNEL_COMPRESSED)
-else
-KERNEL_IMAGE		:= $(KERNEL_BINARY)
-endif
-KERNEL_DTS_DIR		:= $(KERNEL_BOOT_DIR)/dts
-KERNEL_DTB_OUT		:= $(KERNEL_OUT)/$(KERNEL_DTS_DIR)
 ANDROID_DTS_OVERLAY	?= $(LOCAL_PATH)/empty.dts
-ANDROID_DTBO		:= $(KERNEL_DTB_OUT)/fstab-android-sdcard.dtbo
+
+ANDROID_DTBO		:= $(PRODUCT_OUT)/obj/GLODROID/DTBO/fstab-android-sdcard.dtbo
 BOARD_PREBUILT_DTBOIMAGE := $(PRODUCT_OUT)/boot_dtbo.img
 MKDTBOIMG		:= $(HOST_OUT_EXECUTABLES)/mkdtboimg.py
-
 GEN_DTBCFG		:= $(PRODUCT_OUT)/gen/DTBO/dtbo.cfg
 
-KERNEL_SRC_FILES        := $(sort $(shell find -L $(KERNEL_SRC) -not -path '*/\.git/*'))
-
-KMAKE := \
-    $(MAKE_COMMON) $(MAKE_COMMON_CLANG) \
-    -C $(KERNEL_SRC) O=$(AOSP_TOP_ABS)/$(KERNEL_OUT) \
-    DTC_FLAGS='--symbols' \
-
-#-------------------------------------------------------------------------------
-$(KERNEL_OUT)/.config: $(KERNEL_DEFCONFIG) $(KERNEL_FRAGMENTS) $(KERNEL_SRC_FILES)
-	cp $(KERNEL_DEFCONFIG) $(KERNEL_OUT)/.config
-	$(KMAKE) olddefconfig
-	PATH=/usr/bin:/bin:$$PATH $(KERNEL_SRC)/scripts/kconfig/merge_config.sh -m -O $(KERNEL_OUT)/ $(KERNEL_OUT)/.config $(KERNEL_FRAGMENTS)
-	$(KMAKE) olddefconfig
-
-$(KERNEL_BINARY): $(KERNEL_SRC_FILES) $(KERNEL_OUT)/.config
-	$(KMAKE) $(KERNEL_TARGET) dtbs modules -j$(NUMPROC)
-	touch $@
-
-$(KERNEL_COMPRESSED): $(KERNEL_BINARY)
-	rm -f $@
-	PATH=/usr/bin:/bin:/sbin:$$PATH lz4c -c1 $< $@
-	touch $@
-
-# Modules
-
-$(KERNEL_MODULES_OUT): $(KERNEL_BINARY)
-	rm -rf $@
-	$(KMAKE) INSTALL_MOD_PATH=$(AOSP_TOP_ABS)/$@ modules_install
-
-$(TARGET_VENDOR_MODULES)/modules.dep : $(KERNEL_MODULES_OUT)
+$(TARGET_VENDOR_MODULES)/modules.dep: $(KERNEL_TARGET)
 	rm -rf $(TARGET_VENDOR_MODULES)/kernel
 	rm -f $(TARGET_VENDOR_MODULES)/modules.*
-	mkdir -p $(TARGET_VENDOR_MODULES)
-	D1=$</lib/modules/$$(cat $(KERNEL_VERSION_FILE)); \
-	    cp -r $${D1}/modules.dep $${D1}/modules.order $${D1}/modules.alias $${D1}/kernel $(TARGET_VENDOR_MODULES)
-	D2=/vendor_dlkm/lib/modules/kernel/; sed -e"s|^kernel/|$${D2}|; s| kernel/| $${D2}|g" -i $(TARGET_VENDOR_MODULES)/modules.dep
+	mkdir -p $(TARGET_VENDOR_MODULES)/kernel
+	cp -r $(KERNEL_OUT)/install/modules/lib/modules/GloDroid/kernel/* $(TARGET_VENDOR_MODULES)/kernel/
+	cp -r $(KERNEL_OUT)/install/modules/lib/modules/GloDroid/modules.* $(TARGET_VENDOR_MODULES)/
+	touch $@
+
+$(PRODUCT_OUT)/kernel: $(KERNEL_TARGET) $(TARGET_VENDOR_MODULES)/modules.dep
+	cp -v $< $@
 
 $(PRODUCT_OUT)/vendor_dlkm.img: $(TARGET_VENDOR_MODULES)/modules.dep
 
@@ -121,17 +103,13 @@ endif
 	echo "$(AOSP_TOP_ABS)/$(ANDROID_DTBO)" >> $@
 	echo "  id=0x00000FFF" >> $@
 
-$(BOARD_PREBUILT_DTBOIMAGE): $(GEN_DTBCFG) $(ANDROID_DTBO) $(KERNEL_BINARY) $(MKDTBOIMG)
+$(BOARD_PREBUILT_DTBOIMAGE): $(GEN_DTBCFG) $(ANDROID_DTBO) $(KERNEL_TARGET) $(MKDTBOIMG)
 	$(call pretty,"Target dtb image: $@")
 	$(MKDTBOIMG) cfg_create $@ $<
-
-#-------------------------------------------------------------------------------
-$(PRODUCT_OUT)/kernel: $(KERNEL_IMAGE) $(KERNEL_MODULES_OUT)
-	cp -v $< $@
 
 #-------------------------------------------------------------------------------
 
 include $(LOCAL_PATH)/rtl8189es-mod.mk
 include $(LOCAL_PATH)/rtl8189fs-mod.mk
 
-endif # TARGET_PREBUILT_KERNEL
+endif # BOARD_BUILD_GLODROID_KERNEL
