@@ -11,6 +11,7 @@ BOARD_DBUS_SRC_DIR := glodroid/vendor/dbus
 
 BOARD_BUILD_AOSPEXT_GLIB := true
 BOARD_GLIB_SRC_DIR := glodroid/vendor/glib
+BOARD_GLIB_PATCHES_DIRS := $(BCM_PATH)/patches-glib
 
 BOARD_BUILD_AOSPEXT_LIBGUDEV := true
 BOARD_LIBGUDEV_SRC_DIR := glodroid/vendor/libgudev

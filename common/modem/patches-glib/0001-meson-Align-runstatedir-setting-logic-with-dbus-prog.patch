@@ -1,0 +1,46 @@
+From 6d3299ca08150eb6f1484638e862a7f7a8a3329c Mon Sep 17 00:00:00 2001
+From: Roman Stratiienko <r.stratiienko@gmail.com>
+Date: Sun, 5 Feb 2023 20:17:45 +0200
+Subject: [PATCH] meson: Align runstatedir setting logic with dbus progect
+
+Current runstatedir setting logic doesn't allow setting
+runstatedir outside glib_prefix directory which is required
+in some cases.
+
+Fixes: 30995f9dd7c2 ("build: Add runtime_dir option to set runstatedir path")
+Signed-off-by: Roman Stratiienko <r.stratiienko@gmail.com>
+---
+ meson.build | 17 ++++++++---------
+ 1 file changed, 8 insertions(+), 9 deletions(-)
+
+diff --git a/meson.build b/meson.build
+index 8d3500ad7..3b8b8379c 100644
+--- a/meson.build
++++ b/meson.build
+@@ -125,15 +125,14 @@ endif
+ 
+ glib_localstatedir = glib_prefix / get_option('localstatedir')
+ 
+-if get_option('runtime_dir') != ''
+-  glib_runstatedir = glib_prefix / get_option('runtime_dir')
+-else
+-  # While we’d normally prefix directories like this with, for example,
+-  # glib_localstatedir, `/run` is a bit different in that it’s for runtime state
+-  # rather than data files, so it’s typically functionally useless to use a
+-  # prefixed version. No other processes will be using it. So we default to the
+-  # unprefixed system `/run` directory.
+-  glib_runstatedir = '/run'
++glib_runstatedir = get_option('runtime_dir')
++
++if glib_runstatedir == ''
++    if get_option('prefix') == '/usr'
++        glib_runstatedir = '/run'
++    else
++        glib_runstatedir = get_option('localstatedir') / 'run'
++    endif
+ endif
+ 
+ installed_tests_metadir = join_paths(glib_datadir, 'installed-tests', meson.project_name())
+-- 
+2.37.2
+
