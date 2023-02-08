@@ -159,3 +159,5 @@ BOARD_VENDOR_SEPOLICY_DIRS       += $(B_LOCAL_PATH)/sepolicy/vendor
 BOARD_USES_GLODROID_MAKE_TARGETS := true
 
 BOARD_BUILD_GLODROID_KERNEL := true
+
+RUST_BIN_DIR := glodroid/compilers/rust/1.65.0/bin
