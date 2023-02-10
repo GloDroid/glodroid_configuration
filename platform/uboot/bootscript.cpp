@@ -155,7 +155,7 @@ FUNC_BEGIN(bootcmd_start)
  adtimg get dt --id=\$overlay_fdt_id dtb_start dtb_size overlay_fdt_index &&
  cp.b \$dtb_start \$dtboaddr \$dtb_size &&
  fdt resize 8192 &&
-#ifdef device_pinephonepro
+#ifdef platform_rockchip
  fdt rsvmem add 0x8000000 0x8000000 &&
  fdt rsvmem print &&
 #endif
