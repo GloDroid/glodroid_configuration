@@ -12,9 +12,15 @@ BOARD_MESA3D_SRC_DIR := glodroid/vendor/mesa3d
 BOARD_MESA3D_GALLIUM_DRIVERS := lima
 BOARD_MESA3D_BUILD_LIBGBM := true
 
+ifeq ($(GD_USE_RS_HWCOMPOSER),)
 BOARD_BUILD_AOSPEXT_DRMHWCOMPOSER := true
 BOARD_DRMHWCOMPOSER_SRC_DIR := glodroid/vendor/drm_hwcomposer
 BOARD_DRMHWCOMPOSER_PATCHES_DIRS += $(BCG_PATH)/patches-drm_hwcomposer
+DEVICE_MANIFEST_FILE += $(BCG_PATH)/android.hardware.graphics.composer@2.4.xml
+else
+BOARD_BUILD_AOSPEXT_RSHWCOMPOSER := true
+BOARD_RSHWCOMPOSER_SRC_DIR := glodroid/vendor/rs-hwcomposer
+endif
 
 BOARD_BUILD_AOSPEXT_MINIGBM := true
 BOARD_MINIGBM_SRC_DIR := glodroid/vendor/minigbm
@@ -23,6 +29,5 @@ BOARD_MINIGBM_PATCHES_DIRS += $(BCG_PATH)/patches-minigbm
 DEVICE_MANIFEST_FILE += \
     $(BCG_PATH)/android.hardware.graphics.allocator@4.0.xml \
     $(BCG_PATH)/android.hardware.graphics.mapper@4.0.xml \
-    $(BCG_PATH)/android.hardware.graphics.composer@2.4.xml \
 
 BOARD_VENDOR_SEPOLICY_DIRS       += $(BCG_PATH)/sepolicy/vendor

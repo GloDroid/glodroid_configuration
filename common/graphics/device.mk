@@ -18,10 +18,19 @@ PRODUCT_COPY_FILES += \
 PRODUCT_COPY_FILES += \
     frameworks/native/data/etc/android.software.opengles.deqp.level-2021-03-01.xml:$(TARGET_COPY_OUT_VENDOR)/etc/permissions/android.software.opengles.deqp.level.xml
 
+ifeq ($(GD_USE_RS_HWCOMPOSER),)
 # Composer passthrough HAL
 PRODUCT_PACKAGES += \
     android.hardware.graphics.composer@2.4-impl \
     android.hardware.graphics.composer@2.4-service \
+    hwcomposer.drm_gd \
+
+PRODUCT_PROPERTY_OVERRIDES += ro.hardware.hwcomposer=drm_gd
+else
+PRODUCT_PACKAGES += \
+    android.hardware.composer.hwc3-service.rs \
+    android.hardware.composer.hwc3-rs.rc android.hardware.composer.hwc3-rs.xml
+endif
 
 ## Composer HAL for gralloc4 + minigbm gralloc4
 PRODUCT_PACKAGES += \
@@ -29,10 +38,7 @@ PRODUCT_PACKAGES += \
     android.hardware.graphics.mapper@4.0-impl.minigbm_gd \
     libminigbm_gralloc_gd \
     libgbm_mesa_wrapper \
-    hwcomposer.drm_gd \
 
-PRODUCT_PROPERTY_OVERRIDES += \
-    ro.hardware.hwcomposer=drm_gd \
 ##
 
 GD_LCD_DENSITY ?= 160
