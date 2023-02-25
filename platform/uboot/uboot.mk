@@ -116,11 +116,17 @@ endif
 
 BOOTSCRIPT_GEN := $(PRODUCT_OUT)/gen/BOOTSCRIPT/boot.txt
 
-$(BOOTSCRIPT_GEN): $(BSP_UBOOT_PATH)/bootscript.cpp $(BSP_UBOOT_PATH)/bootscript.h
+GD_BOOTSCRIPT ?= $(BSP_UBOOT_PATH)/bootscript.cpp
+GD_BOOTSCRIPT_OVERLAY_PLATFORM ?= $(BSP_UBOOT_PATH)/platform_$(PRODUCT_BOARD_PLATFORM).h
+GD_BOOTSCRIPT_OVERLAY_DEVICE ?= $(BSP_UBOOT_PATH)/device_generic.h
+
+$(BOOTSCRIPT_GEN): $(GD_BOOTSCRIPT) $(BSP_UBOOT_PATH)/bootscript.h $(GD_BOOTSCRIPT_OVERLAY_PLATFORM) $(GD_BOOTSCRIPT_OVERLAY_DEVICE)
 	mkdir -p $(dir $@)
-	$(CLANG) -E -P -Wno-invalid-pp-token $< -o $@ \
-	    -Dplatform_$(PRODUCT_BOARD_PLATFORM) \
-	    -Ddevice_$(PRODUCT_DEVICE) \
+	cp $(GD_BOOTSCRIPT) $(dir $(BOOTSCRIPT_GEN))/
+	cp $(BSP_UBOOT_PATH)/bootscript.h $(dir $(BOOTSCRIPT_GEN))/
+	cp $(GD_BOOTSCRIPT_OVERLAY_PLATFORM) $(dir $(BOOTSCRIPT_GEN))/platform.h
+	cp $(GD_BOOTSCRIPT_OVERLAY_DEVICE) $(dir $(BOOTSCRIPT_GEN))/device.h
+	$(CLANG) -E -P -Wno-invalid-pp-token $(dir $(BOOTSCRIPT_GEN))/$(notdir $<) -o $@ \
 	    -D__SYSFS_MMC0_PATH__=$(SYSFS_MMC0_PATH) \
 	    -D__SYSFS_MMC1_PATH__=$(SYSFS_MMC1_PATH) \
 

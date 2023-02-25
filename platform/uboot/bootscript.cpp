@@ -7,26 +7,13 @@
  */
 
 #include "bootscript.h"
+#include "platform.h"
+#include "device.h"
 
-#ifdef platform_broadcom
-setenv dtbaddr 0x1fa00000
-setenv loadaddr 0x10008000
-setenv vloadaddr 0x13008000
-setenv dtboaddr 0x12008000
-#endif
-
-#ifdef platform_sunxi
-setenv dtbaddr 0x5fa00000
-setenv loadaddr 0x50008000
-setenv vloadaddr 0x53008000
-setenv dtboaddr 0x52008000
-#endif
-
-#ifdef platform_rockchip
-setenv dtbaddr 0x1fa00000
-setenv loadaddr 0x10008000
-setenv vloadaddr 0x13008000
-setenv dtboaddr 0x12008000
+#ifdef PLATFORM_SETUP_ENV
+PLATFORM_SETUP_ENV()
+#else
+#error PLATFORM_SETUP_ENV is not defined
 #endif
 
 setenv    main_fdt_id 0x100
@@ -35,8 +22,8 @@ setenv overlay_fdt_id 0xFFF
 /* EMMC cards have 512k erase block size. Align partitions accordingly to avoid issues with erasing. */
 
 setenv partitions "uuid_disk=\${uuid_gpt_disk}"
-#ifdef platform_rockchip
-EXTENV(partitions, ";name=bootloader,start=32K,size=131040K,uuid=\${uuid_gpt_bootloader}")
+#ifdef BOOTLOADER_PARTITION_OVERRIDE
+BOOTLOADER_PARTITION_OVERRIDE()
 #else
 EXTENV(partitions, ";name=bootloader,start=128K,size=130944K,uuid=\${uuid_gpt_bootloader}")
 #endif
@@ -62,6 +49,9 @@ EXTENV(bootargs, " firmware_class.path=/vendor/etc/firmware")
 EXTENV(bootargs, " ${debug_bootargs} printk.devkmsg=on")
 
 FUNC_BEGIN(enter_fastboot)
+#ifdef PRE_ENTER_FASTBOOT
+ PRE_ENTER_FASTBOOT()
+#endif
  setenv fastboot_fail 0
 #ifdef platform_sunxi
  /* OTG on sunxi require USB to be initialized */
@@ -128,36 +118,22 @@ FUNC_BEGIN(bootcmd_start)
  abootimg addr \$loadaddr \$vloadaddr
 
  adtimg addr \${dtboaddr}
-#ifdef platform_sunxi
-#ifdef device_pinephone
-/* Select proper DTS version for PinePhone (v1.1 or v1.2) */
- setenv main_fdt_id 0x11; /* -> PinePhone v1.1 */
- if test STRESC(\${fdtfile}) != STRESC(allwinner/sun50i-a64-pinephone-1.1.dtb);
- then
-  setenv main_fdt_id 0x12; /* -> PinePhone v1.2 */
- fi;
+#ifdef DEVICE_HANDLE_FDT
+ DEVICE_HANDLE_FDT()
 #endif
- adtimg get dt --id=\$main_fdt_id dtb_start dtb_size main_fdt_index &&
- cp.b \$dtb_start \$dtbaddr \$dtb_size &&
- fdt addr \$dtbaddr &&
-#endif
-
-#ifdef platform_rockchip
- adtimg get dt --id=\$main_fdt_id dtb_start dtb_size main_fdt_index &&
- cp.b \$dtb_start \$dtbaddr \$dtb_size &&
- fdt addr \$dtbaddr &&
+#ifdef PLATFORM_HANDLE_FDT
+ PLATFORM_HANDLE_FDT()
+#else
+#error PLATFORM_HANDLE_FDT is not defined
 #endif
 
 #ifdef platform_broadcom
-/* raspberrypi vc bootloader prepare fdt based on many factors. Use this fdt instead of dtb compiled by the kernel */
- fdt addr \${fdt_addr} &&
 #endif
  adtimg get dt --id=\$overlay_fdt_id dtb_start dtb_size overlay_fdt_index &&
  cp.b \$dtb_start \$dtboaddr \$dtb_size &&
  fdt resize 8192 &&
-#ifdef platform_rockchip
- fdt rsvmem add 0x8000000 0x8000000 &&
- fdt rsvmem print &&
+#ifdef POSTPROCESS_FDT
+ POSTPROCESS_FDT()
 #endif
  fdt apply \$dtboaddr &&
  FEXTENV(bootargs, " androidboot.dtbo_idx=\${main_fdt_index},\${overlay_fdt_index}") ;
@@ -167,16 +143,7 @@ FUNC_BEGIN(bootcmd_start)
 FUNC_END()
 
 FUNC_BEGIN(bootcmd_block)
-#ifdef device_pinephone
- if test STRESC(\$volume_key) = STRESC("up");
- then
-  run enter_fastboot ;
- fi;
- if test STRESC(\$volume_key) = STRESC("down");
- then
-  setenv androidrecovery true ;
- fi;
-#endif
+ DEVICE_HANDLE_BUTTONS()
  run bootcmd_bcb
  if test STRESC(\$androidrecovery) = STRESC("true");
  then
