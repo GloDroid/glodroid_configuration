@@ -5,7 +5,6 @@ NATIVE_PATH := PATH=/sbin:/bin:/usr/bin:$$PATH
 DEPLOY_TOOLS := \
 	$(HOST_OUT_EXECUTABLES)/adb \
 	$(HOST_OUT_EXECUTABLES)/fastboot \
-	$(HOST_OUT_EXECUTABLES)/mke2fs \
 
 DEPLOY_BOOTLOADER := \
 	$(PRODUCT_OUT)/bootloader-sd.img \

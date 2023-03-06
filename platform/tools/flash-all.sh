@@ -29,7 +29,6 @@ set -x
 
 ./fastboot flash super  super.img
 
-./fastboot format:ext4 userdata
-./fastboot format:ext4 metadata
+./fastboot -w
 
 ./fastboot reboot
