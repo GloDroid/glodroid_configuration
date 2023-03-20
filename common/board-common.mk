@@ -1,5 +1,15 @@
 CBC_LOCAL_PATH := $(patsubst $(CURDIR)/%,%,$(dir $(abspath $(lastword $(MAKEFILE_LIST)))))
 
+# Lineage OS support
+ifeq ($(wildcard lineage),lineage)
+TARGET_KERNEL_CONFIG := defconfig
+TARGET_KERNEL_SOURCE := $(BOARD_KERNEL_SRC_DIR)
+TARGET_KERNEL_CLANG_COMPILE := true
+TARGET_KERNEL_VERSION :=
+TARGET_NO_KERNEL_OVERRIDE := true
+include vendor/lineage/config/BoardConfigLineage.mk
+endif
+
 include $(CBC_LOCAL_PATH)/base/board.mk
 
 include $(CBC_LOCAL_PATH)/other-hals/board.mk

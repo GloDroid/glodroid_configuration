@@ -6,9 +6,13 @@ else ifneq (,$(filter %_auto,$(TARGET_PRODUCT)))
 # TODO: Implement
     $(call inherit-product, $(SRC_TARGET_DIR)/product/full_base.mk)
 else
+ifeq ($(wildcard lineage),lineage)
+    $(call inherit-product, vendor/lineage/config/common_full_phone.mk)
+else
     $(call inherit-product, $(SRC_TARGET_DIR)/product/full_base.mk)
 endif
 
+endif
 
 $(call inherit-product, $(LOCAL_PATH)/base/device.mk)
 
