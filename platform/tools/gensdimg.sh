@@ -15,23 +15,37 @@ PTR=$PART_START
 pn=1
 
 add_part() {
-	SIZE=$(stat $1 -c%s)
-	# Align size
-	echo $1: size=$SIZE
-	echo $1: partition offset=$PTR
+	echo -e "\033[95m===> Adding partition $1, image $2, size=$3, offset=$PTR\033[0m"
 
-	if [ -z "$3" ]; then
+	SIZE=$3
+	if [ -z "$SIZE" ]; then
+	    SIZE=$(stat $2 -c%s)
+	fi
+
+	SGCMD="--new $pn:$(( PTR / 512 )):$(( ($PTR + $SIZE - 1) / 512 ))"
+
+	sgdisk --set-alignment=1 $SGCMD --change-name=$pn:"$1" ${SDIMG}
+
+	dd if=$2 of=$SDIMG bs=4k count=$(( SIZE / 4096 )) seek=$(( $PTR / 4096 )) conv=notrunc && sync
+
+	PTR=$(( ($PTR + $SIZE + $ALIGN - 1) / $ALIGN * $ALIGN ))
+	pn=$(( $pn + 1 ))
+}
+
+add_empty_part() {
+	SIZE=$2
+	echo -e "\033[95m===> Adding empty partition $1: size=$SIZE, offset=$PTR\033[0m"
+
+	if [ "$SIZE" != "-" ]; then
 	    SGCMD="--new $pn:$(( PTR / 512 )):$(( ($PTR + $SIZE - 1) / 512 ))"
 	else
 	    SGCMD="--largest-new=$pn"
 	fi
 
-	sgdisk --set-alignment=1 $SGCMD --change-name=$pn:"$2" ${SDIMG}
-
-	dd if=$1 of=$SDIMG bs=4k count=$(( SIZE/4096 )) seek=$(( $PTR / 4096 )) conv=notrunc && sync
+	sgdisk --set-alignment=1 $SGCMD --change-name=$pn:"$1" ${SDIMG}
 
 	PTR=$(( ($PTR + $SIZE + $ALIGN - 1) / $ALIGN * $ALIGN ))
-	pn=$(( $pn+1 ))
+	pn=$(( $pn + 1 ))
 }
 
 prepare_disk() {
@@ -66,21 +80,23 @@ EOF
 gen_sd() {
     prepare_disk $(( 1024 * 8 )) # Default size - 8 GB
 
-    dd if=/dev/zero of=misc.img bs=4096 count=$(( (1024 * 512) / 4096 ))
-
-    dd if=/dev/zero of=metadata.img bs=4k count=$(( (1024 * 1024 * 16) / 4096 ))
-
     echo "===> Add partitions"
-    add_part bootloader-sd.img bootloader
-    add_part env.img uboot-env
-    add_part boot.img recovery_boot
-    add_part misc.img misc
-    add_part boot.img boot
-    add_part boot_dtbo.img dtbo_a
-    add_part metadata.img metadata
-    add_part super.img super
-    add_part vbmeta.img vbmeta
-    add_part metadata.img userdata fit
+    add_part       bootloader      bootloader-sd.img
+    add_part       uboot-env       env.img
+    add_empty_part misc                                  $(( 512 * 1024 ))
+    add_part       boot_a          boot.img        $(( 64 * 1024 * 1024 ))
+    add_empty_part boot_b                          $(( 64 * 1024 * 1024 ))
+    add_part       vendor_boot_a   vendor_boot.img $(( 32 * 1024 * 1024 ))
+    add_empty_part vendor_boot_b                   $(( 32 * 1024 * 1024 ))
+    add_part       dtbo_a          boot_dtbo.img    $(( 8 * 1024 * 1024 ))
+    add_empty_part dtbo_b                           $(( 8 * 1024 * 1024 ))
+    add_part       vbmeta_a        vbmeta.img            $(( 512 * 1024 ))
+    add_empty_part vbmeta_b                              $(( 512 * 1024 ))
+    add_part       vbmeta_system_a vbmeta_system.img     $(( 512 * 1024 ))
+    add_empty_part vbmeta_system_b                       $(( 512 * 1024 ))
+    add_part       super           super.img
+    add_empty_part metadata                        $(( 16 * 1024 * 1024 ))
+    add_empty_part userdata -
 
     if [ "$PLATFORM" = "broadcom" ]; then
         modify_for_rpi
@@ -93,12 +109,12 @@ gen_deploy() {
 
     echo "===> Add partitions"
     if [ "$PLATFORM" = "rockchip" ] && [ "$SUFFIX" == "emmc" ]; then
-        add_part bootloader-deploy-emmc.img bootloader
+        add_part bootloader bootloader-deploy-emmc.img
     else
-        add_part bootloader-$SUFFIX.img bootloader
+        add_part bootloader bootloader-$SUFFIX.img
     fi
-    add_part env.img uboot-env
-    add_part boot.img recovery_boot
+    add_part uboot-env env.img
+    add_part recovery_boot boot.img
 
     if [ "$PLATFORM" = "broadcom" ]; then
         modify_for_rpi
@@ -147,3 +163,5 @@ case $TYPE in
     gen_sd
     ;;
 esac
+
+echo -e "\033[32m\n   DONE\033[0m"

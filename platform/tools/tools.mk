@@ -54,11 +54,12 @@ $(PRODUCT_OUT)/deploy-sd-for-emmc.img: $(GENSDIMG) $(DEPLOY_BOOTLOADER) $(PRODUC
 $(PRODUCT_OUT)/deploy-gpt.img: $(PRODUCT_OUT)/deploy-sd.img $(GENSDIMG)
 	dd if=$< of=$@ bs=1k count=128
 
-$(PRODUCT_OUT)/sdcard.img: $(GENSDIMG)
+$(PRODUCT_OUT)/sdcard.img: $(GENSDIMG) $(DEPLOY_FILES)
 	$(call pretty,"Creating sdcard image...")
-	$(NATIVE_PATH) $< -C=$(PRODUCT_OUT) -T=SD -P=$(PRODUCT_BOARD_PLATFORM) $@
+	$(NATIVE_PATH) $< -C=$(PRODUCT_OUT) -T=SD -P=$(PRODUCT_BOARD_PLATFORM)
 
-sdcard: droid $(PRODUCT_OUT)/sdcard.img
+.PHONY: sdcard
+sdcard: $(PRODUCT_OUT)/sdcard.img
 
 $(PRODUCT_OUT)/images.tar.gz: $(DEPLOY_FILES)
 	cp $(DEPLOY_TOOLS) $(PRODUCT_OUT)
