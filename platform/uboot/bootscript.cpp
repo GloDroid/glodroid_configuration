@@ -143,7 +143,9 @@ FUNC_BEGIN(bootcmd_start)
 FUNC_END()
 
 FUNC_BEGIN(bootcmd_block)
+#ifdef DEVICE_HANDLE_BUTTONS
  DEVICE_HANDLE_BUTTONS()
+#endif
  run bootcmd_bcb
  if test STRESC(\$androidrecovery) = STRESC("true");
  then
