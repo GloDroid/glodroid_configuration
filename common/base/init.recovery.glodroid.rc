@@ -1,4 +1,5 @@
 on init
+    setprop sys.usb.typec.data_role device
     setprop sys.usb.configfs 1
 
 service console /system/bin/sh
