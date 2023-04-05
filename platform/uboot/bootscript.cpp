@@ -69,10 +69,7 @@ FUNC_BEGIN(enter_fastboot)
 FUNC_END()
 
 FUNC_BEGIN(bootcmd_bcb)
- /* ab_select is used as counter of failed boot attempts. After 14 failed boot attempt fallback to fastboot. */
- ab_select slot_name mmc \${mmc_bootdev}#misc || run enter_fastboot ;
-
- FEXTENV(bootargs, " androidboot.slot_suffix=_\$slot_name") ;
+ ab_test slot_name mmc \${mmc_bootdev}#misc || run enter_fastboot ;
 
  bcb load $mmc_bootdev misc ;
  /* Handle $ adb reboot bootloader */
@@ -81,6 +78,14 @@ FUNC_BEGIN(bootcmd_bcb)
  bcb test command = boot-fastboot && setenv androidrecovery true ;
  /* Handle $ adb reboot recovery (Android 11+) */
  bcb test command = boot-recovery && setenv androidrecovery true ;
+
+ if test STRESC(\${androidrecovery}) != STRESC(true);
+ then
+  /* ab_select is used as counter of failed boot attempts. After 14 failed boot attempt fallback to fastboot. */
+  ab_select slot_name mmc \${mmc_bootdev}#misc || run enter_fastboot ;
+ fi;
+
+ FEXTENV(bootargs, " androidboot.slot_suffix=_\$slot_name") ;
 FUNC_END()
 
 FUNC_BEGIN(avb_verify)
