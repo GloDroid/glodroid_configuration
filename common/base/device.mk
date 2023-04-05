@@ -65,3 +65,10 @@ PRODUCT_BUILD_SUPER_PARTITION := true
 PRODUCT_PACKAGES += \
     glodroid_overlay_frameworks_base_core \
     glodroid_overlay_settings_provider \
+
+# A/B
+PRODUCT_PACKAGES += \
+    update_engine \
+    update_engine_client \
+    update_verifier \
+    update_engine_sideload \
