@@ -109,7 +109,7 @@ BOARD_GLODROID_DYNAMIC_PARTITIONS_SIZE := $(shell echo $$(( $(BOARD_SUPER_PARTIT
 BOARD_GLODROID_DYNAMIC_PARTITIONS_PARTITION_LIST := system system_ext vendor product vendor_dlkm
 
 AB_OTA_UPDATER := true
-AB_OTA_PARTITIONS += boot system system_ext vendor product vendor_dlkm vendor_boot vbmeta vbmeta_system
+AB_OTA_PARTITIONS += boot system system_ext vendor product vendor_dlkm vendor_boot vbmeta vbmeta_system dtbo
 
 TARGET_RECOVERY_PIXEL_FORMAT := RGBX_8888
 
