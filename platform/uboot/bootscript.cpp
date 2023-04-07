@@ -175,8 +175,27 @@ FUNC_BEGIN(bootcmd_block)
  mmc read \$dtboaddr \$dtbo_start \$dtbo_size
 FUNC_END()
 
+FUNC_BEGIN(rename_and_expand_userdata_placeholder)
+  part number mmc ${mmc_bootdev} userdata_placeholder partition_number
+  if test -n "${partition_number}";
+  then
+    echo "Renaming userdata_placeholder partition to userdata...";
+    gpt read mmc ${mmc_bootdev} current_layout
+    setexpr new_layout gsub "name=userdata_placeholder" "name=userdata" ${current_layout}
+    gpt write mmc ${mmc_bootdev} ${new_layout}
+    echo "The userdata_placeholder partition has been renamed to userdata.";
+
+    echo "Expanding userdata partition to fill the entire drive...";
+    gpt read mmc ${mmc_bootdev} expanded_layout
+    setexpr final_layout gsub "name=userdata,start=[^,]*,size=[^,]*,uuid" "name=userdata,start=[^,]*,size=-,uuid" ${expanded_layout}
+    gpt write mmc ${mmc_bootdev} ${final_layout}
+    echo "The userdata partition has been expanded.";
+  fi;
+FUNC_END()
+
 FUNC_BEGIN(bootcmd)
  run bootcmd_prepare_env ;
+ run rename_and_expand_userdata_placeholder ;
  run bootcmd_block ;
  run bootcmd_start ;
 FUNC_END()

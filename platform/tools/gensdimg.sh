@@ -78,7 +78,7 @@ EOF
 }
 
 gen_sd() {
-    prepare_disk $(( 1024 * 8 )) # Default size - 8 GB
+    prepare_disk $(( 1024 * 4 )) # Default size - 4 GB
 
     echo "===> Add partitions"
     add_part       bootloader      bootloader-sd.img
@@ -96,7 +96,7 @@ gen_sd() {
     add_empty_part vbmeta_system_b                       $(( 512 * 1024 ))
     add_part       super           super.img
     add_empty_part metadata                        $(( 16 * 1024 * 1024 ))
-    add_empty_part userdata -
+    add_empty_part userdata_placeholder -
 
     if [ "$PLATFORM" = "broadcom" ]; then
         modify_for_rpi
