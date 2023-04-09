@@ -1,0 +1,2 @@
+# Ffmpeg codec2
+/vendor/bin/hw/android\.hardware\.media\.c2@1\.2-service-ffmpeg(.*)?		u:object_r:mediacodec_exec:s0
