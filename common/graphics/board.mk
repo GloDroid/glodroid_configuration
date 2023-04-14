@@ -15,7 +15,6 @@ BOARD_MESA3D_BUILD_LIBGBM := true
 ifeq ($(GD_USE_RS_HWCOMPOSER),)
 BOARD_BUILD_AOSPEXT_DRMHWCOMPOSER := true
 BOARD_DRMHWCOMPOSER_SRC_DIR := glodroid/vendor/drm_hwcomposer
-BOARD_DRMHWCOMPOSER_PATCHES_DIRS += $(BCG_PATH)/patches-drm_hwcomposer
 DEVICE_MANIFEST_FILE += $(BCG_PATH)/android.hardware.graphics.composer@2.4.xml
 else
 BOARD_BUILD_AOSPEXT_RSHWCOMPOSER := true
