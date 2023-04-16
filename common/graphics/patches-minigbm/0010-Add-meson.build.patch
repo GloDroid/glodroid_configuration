@@ -1,7 +1,7 @@
-From 57f15c669e91a6d6e81cf654cf297ac8034c101b Mon Sep 17 00:00:00 2001
+From ae58d9901b157fcb6b442b6d6ac187670d6495e6 Mon Sep 17 00:00:00 2001
 From: Roman Stratiienko <r.stratiienko@gmail.com>
 Date: Sat, 17 Dec 2022 19:44:49 +0200
-Subject: [PATCH 10/13] Add meson.build
+Subject: [PATCH 10/18] Add meson.build
 
 Change-Id: I5d5cb9948206b15e833ff63a7dccd2b1002c8cf3
 Signed-off-by: Roman Stratiienko <r.stratiienko@gmail.com>
@@ -10,12 +10,12 @@ Signed-off-by: Roman Stratiienko <r.stratiienko@gmail.com>
  cros_gralloc/gralloc4/meson.build        | 38 +++++++++++
  cros_gralloc/meson.build                 | 16 +++++
  dmabuf_driver/dmabuf_external_driver.cpp |  7 +-
- drv.c                                    | 33 ++++++----
+ drv.c                                    | 32 ++++++----
  gbm_mesa_driver/gbm_mesa_driver.cpp      |  7 +-
  gbm_mesa_driver/gbm_mesa_internals.cpp   | 10 ++-
  gbm_mesa_driver/meson.build              | 11 ++++
  meson.build                              | 81 ++++++++++++++++++++++++
- 9 files changed, 188 insertions(+), 25 deletions(-)
+ 9 files changed, 187 insertions(+), 25 deletions(-)
  create mode 100644 cros_gralloc/gralloc0/meson.build
  create mode 100644 cros_gralloc/gralloc4/meson.build
  create mode 100644 cros_gralloc/meson.build
@@ -105,7 +105,7 @@ index 0000000..ffd2d4c
 +subdir('gralloc0')
 +subdir('gralloc4')
 diff --git a/dmabuf_driver/dmabuf_external_driver.cpp b/dmabuf_driver/dmabuf_external_driver.cpp
-index b01a745..4f8ebd0 100644
+index a50e2d3..94b9e4b 100644
 --- a/dmabuf_driver/dmabuf_external_driver.cpp
 +++ b/dmabuf_driver/dmabuf_external_driver.cpp
 @@ -7,7 +7,7 @@
@@ -118,7 +118,7 @@ index b01a745..4f8ebd0 100644
  	.init = dmabuf_driver_init,
  	.close = dmabuf_driver_close,
 @@ -21,11 +21,6 @@ struct backend dmabuf_backend = {
- 	.bo_get_plane_fd = dmabuf_bo_get_plane_fd,
+ 	.resolve_format_and_use_flags = dmabuf_resolve_format_and_use_flags,
  };
  
 -struct backend *init_external_backend(int *fd)
@@ -130,7 +130,7 @@ index b01a745..4f8ebd0 100644
  }
  #endif
 diff --git a/drv.c b/drv.c
-index 7a28296..f841911 100644
+index bd27ac3..d2682a6 100644
 --- a/drv.c
 +++ b/drv.c
 @@ -24,15 +24,12 @@
@@ -155,7 +155,7 @@ index 7a28296..f841911 100644
  #ifdef DRV_AMDGPU
  extern const struct backend backend_amdgpu;
  #endif
-@@ -101,7 +98,6 @@ static const struct backend *drv_get_backend(int fd)
+@@ -111,7 +108,6 @@ static const struct backend *drv_get_backend(int fd)
  	drmFreeVersion(drm_version);
  	return NULL;
  }
@@ -163,20 +163,19 @@ index 7a28296..f841911 100644
  
  struct driver *drv_create(int fd)
  {
-@@ -117,8 +113,21 @@ struct driver *drv_create(int fd)
+@@ -127,8 +123,20 @@ struct driver *drv_create(int fd)
  	minigbm_debug = getenv("MINIGBM_DEBUG");
  	drv->compression = (minigbm_debug == NULL) || (strcmp(minigbm_debug, "nocompression") != 0);
  
 -	drv->fd = fd;
 -	drv->backend = drv_get_backend(fd);
-+
 +#ifdef DRV_GBM_MESA
 +	if (fd == -2) {
 +		drv->backend = &backend_gbm_mesa;
 +	} else
 +#endif
 +#ifdef DRV_DMABUF_HEAP
-+	if (fd == -3) {
++	    if (fd == -3) {
 +		drv->backend = &backend_dmabuf_heap;
 +	} else
 +#endif
@@ -188,7 +187,7 @@ index 7a28296..f841911 100644
  	if (!drv->backend)
  		goto free_driver;
 diff --git a/gbm_mesa_driver/gbm_mesa_driver.cpp b/gbm_mesa_driver/gbm_mesa_driver.cpp
-index 3b02ef3..7c71695 100644
+index d2c6c7d..0890fea 100644
 --- a/gbm_mesa_driver/gbm_mesa_driver.cpp
 +++ b/gbm_mesa_driver/gbm_mesa_driver.cpp
 @@ -23,7 +23,7 @@
@@ -201,7 +200,7 @@ index 3b02ef3..7c71695 100644
  	.init = gbm_mesa_driver_init,
  	.close = gbm_mesa_driver_close,
 @@ -37,11 +37,6 @@ struct backend gbm_mesa_backend = {
- 	.bo_get_plane_fd = gbm_mesa_bo_get_plane_fd,
+ 	.resolve_format_and_use_flags = gbm_mesa_resolve_format_and_use_flags,
  };
  
 -struct backend *init_external_backend()
@@ -213,7 +212,7 @@ index 3b02ef3..7c71695 100644
  }
  #endif
 diff --git a/gbm_mesa_driver/gbm_mesa_internals.cpp b/gbm_mesa_driver/gbm_mesa_internals.cpp
-index f4ac16c..8191635 100644
+index 97d5257..548d31c 100644
 --- a/gbm_mesa_driver/gbm_mesa_internals.cpp
 +++ b/gbm_mesa_driver/gbm_mesa_internals.cpp
 @@ -48,8 +48,14 @@ extern "C" {

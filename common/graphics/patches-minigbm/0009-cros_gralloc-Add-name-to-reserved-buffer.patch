@@ -1,7 +1,7 @@
-From 1b83ea0dbd3ea1b83f7b8593d3856897b8821d93 Mon Sep 17 00:00:00 2001
+From 4e4a205a99e8ee182bbf6d2a09462dc91e52cb14 Mon Sep 17 00:00:00 2001
 From: Roman Stratiienko <r.stratiienko@gmail.com>
 Date: Sun, 2 Oct 2022 20:37:37 +0300
-Subject: [PATCH 09/13] cros_gralloc: Add name to reserved buffer
+Subject: [PATCH 09/18] cros_gralloc: Add name to reserved buffer
 
 Change-Id: If76a87d50cf430d5480ddc92925613daa5ac36ea
 Signed-off-by: Roman Stratiienko <r.stratiienko@gmail.com>
@@ -10,10 +10,10 @@ Signed-off-by: Roman Stratiienko <r.stratiienko@gmail.com>
  1 file changed, 3 insertions(+), 1 deletion(-)
 
 diff --git a/cros_gralloc/cros_gralloc_driver.cc b/cros_gralloc/cros_gralloc_driver.cc
-index 0d07305..ec872ec 100644
+index ba4bfce..b4186f0 100644
 --- a/cros_gralloc/cros_gralloc_driver.cc
 +++ b/cros_gralloc/cros_gralloc_driver.cc
-@@ -230,8 +230,10 @@ int cros_gralloc_driver::create_reserved_region(const std::string &buffer_name,
+@@ -258,8 +258,10 @@ int cros_gralloc_driver::create_reserved_region(const std::string &buffer_name,
  
  #if ANDROID_API_LEVEL >= 31 && defined(HAS_DMABUF_SYSTEM_HEAP)
  	ret = allocator_.Alloc(kDmabufSystemHeapName, reserved_region_size);

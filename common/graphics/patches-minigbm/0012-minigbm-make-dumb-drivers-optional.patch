@@ -1,7 +1,7 @@
-From 7c6a19250ea2a195c0414854971f59cf68ff8843 Mon Sep 17 00:00:00 2001
+From cb616a48a06831a0b8a4a342f9a2aa828ca86c5d Mon Sep 17 00:00:00 2001
 From: Roman Stratiienko <r.stratiienko@gmail.com>
 Date: Thu, 22 Dec 2022 21:51:35 +0200
-Subject: [PATCH 12/13] minigbm: make dumb drivers optional
+Subject: [PATCH 12/18] minigbm: make dumb drivers optional
 
 Change-Id: Ie668d4a9d8f18ff1f885979ebe1dcd0a7646fda2
 Signed-off-by: Roman Stratiienko <r.stratiienko@gmail.com>
@@ -10,7 +10,7 @@ Signed-off-by: Roman Stratiienko <r.stratiienko@gmail.com>
  1 file changed, 4 insertions(+)
 
 diff --git a/drv.c b/drv.c
-index adf19c1..2f306a7 100644
+index 50f6b10..8aec66b 100644
 --- a/drv.c
 +++ b/drv.c
 @@ -44,6 +44,7 @@ extern const struct backend backend_vc4;
@@ -27,21 +27,21 @@ index adf19c1..2f306a7 100644
  extern const struct backend backend_vkms;
 +#endif
  
- static const struct backend *drv_get_backend(int fd)
- {
-@@ -81,10 +83,12 @@ static const struct backend *drv_get_backend(int fd)
+ static const struct backend *drv_backend_list[] = {
+ #ifdef DRV_AMDGPU
+@@ -71,10 +73,12 @@ static const struct backend *drv_backend_list[] = {
  #ifdef DRV_VC4
- 		&backend_vc4,
+ 	&backend_vc4,
  #endif
 +#ifdef DRV_DUMB
- 		&backend_evdi,	    &backend_komeda,	&backend_marvell, &backend_mediatek,
- 		&backend_meson,	    &backend_nouveau,	&backend_radeon,  &backend_rockchip,
- 		&backend_sun4i_drm, &backend_synaptics, &backend_udl,	  &backend_virtgpu,
- 		&backend_vkms
+ 	&backend_evdi,	    &backend_komeda,	&backend_marvell, &backend_mediatek,
+ 	&backend_meson,	    &backend_nouveau,	&backend_radeon,  &backend_rockchip,
+ 	&backend_sun4i_drm, &backend_synaptics, &backend_udl,	  &backend_virtgpu,
+ 	&backend_vkms
 +#endif
- 	};
+ };
  
- 	for (i = 0; i < ARRAY_SIZE(backend_list); i++) {
+ void drv_preload(bool load)
 -- 
 2.37.2
 

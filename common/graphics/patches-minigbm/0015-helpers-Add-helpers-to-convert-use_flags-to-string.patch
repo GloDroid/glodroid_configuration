@@ -1,7 +1,7 @@
-From f60c937a492f2cc4b4ca0a07c9fc1632c42963f1 Mon Sep 17 00:00:00 2001
+From 71b307417a2d16f474c9c1a2a3c6e5efefc1decf Mon Sep 17 00:00:00 2001
 From: Roman Stratiienko <r.stratiienko@gmail.com>
 Date: Sun, 25 Sep 2022 19:22:53 +0300
-Subject: [PATCH 2/2] helpers: Add helpers to convert use_flags to string
+Subject: [PATCH 15/18] helpers: Add helpers to convert use_flags to string
 
 Change-Id: Icce8164cde8da483d683c06a4936ffde05b6f515
 Signed-off-by: Roman Stratiienko <r.stratiienko@gmail.com>
@@ -11,10 +11,10 @@ Signed-off-by: Roman Stratiienko <r.stratiienko@gmail.com>
  2 files changed, 52 insertions(+)
 
 diff --git a/drv_helpers.c b/drv_helpers.c
-index 6ff1fc6..bb8cbd6 100644
+index 44f6e1d..2499cdc 100644
 --- a/drv_helpers.c
 +++ b/drv_helpers.c
-@@ -614,3 +614,52 @@ uint32_t drv_get_inode(int dmabuf_fd)
+@@ -624,3 +624,52 @@ uint32_t drv_get_inode(int dmabuf_fd)
  
  	return sb.st_ino;
  }
@@ -68,10 +68,10 @@ index 6ff1fc6..bb8cbd6 100644
 +	return 0;
 +}
 diff --git a/drv_helpers.h b/drv_helpers.h
-index 7dad5bd..f492cf9 100644
+index 5286e8c..0684605 100644
 --- a/drv_helpers.h
 +++ b/drv_helpers.h
-@@ -50,4 +50,7 @@ void drv_resolve_format_and_use_flags_helper(struct driver *drv, uint32_t format
+@@ -52,4 +52,7 @@ void drv_resolve_format_and_use_flags_helper(struct driver *drv, uint32_t format
  
  uint32_t drv_get_inode(int dmabuf_fd);
  

@@ -1,7 +1,7 @@
-From d3c386c22e9c518bb051799f85cb41f6fc913159 Mon Sep 17 00:00:00 2001
+From 5810434cf63fb9e2dac1b67fb174fb248fb1c227 Mon Sep 17 00:00:00 2001
 From: Roman Stratiienko <r.stratiienko@gmail.com>
 Date: Tue, 13 Jul 2021 13:25:31 +0300
-Subject: [PATCH 07/13] minigbm: Add gbm_mesa backend
+Subject: [PATCH 07/18] minigbm: Add gbm_mesa backend
 
 This is adaptation of the Rob Herring's gbm_gralloc HAL [1] to work
 as minigbm backend, optimised to work in modern Android conditions.
@@ -208,7 +208,7 @@ index 0000000..d2de5fb
 +#endif
 diff --git a/gbm_mesa_driver/gbm_mesa_driver.cpp b/gbm_mesa_driver/gbm_mesa_driver.cpp
 new file mode 100644
-index 0000000..3b02ef3
+index 0000000..d2c6c7d
 --- /dev/null
 +++ b/gbm_mesa_driver/gbm_mesa_driver.cpp
 @@ -0,0 +1,47 @@
@@ -246,9 +246,9 @@ index 0000000..3b02ef3
 +	.bo_import = gbm_mesa_bo_import,
 +	.bo_map = gbm_mesa_bo_map,
 +	.bo_unmap = gbm_mesa_bo_unmap,
++	.bo_get_plane_fd = gbm_mesa_bo_get_plane_fd,
 +	.bo_get_map_stride = gbm_mesa_bo_get_map_stride,
 +	.resolve_format_and_use_flags = gbm_mesa_resolve_format_and_use_flags,
-+	.bo_get_plane_fd = gbm_mesa_bo_get_plane_fd,
 +};
 +
 +struct backend *init_external_backend()
@@ -261,7 +261,7 @@ index 0000000..3b02ef3
 +#endif
 diff --git a/gbm_mesa_driver/gbm_mesa_internals.cpp b/gbm_mesa_driver/gbm_mesa_internals.cpp
 new file mode 100644
-index 0000000..f4ac16c
+index 0000000..97d5257
 --- /dev/null
 +++ b/gbm_mesa_driver/gbm_mesa_internals.cpp
 @@ -0,0 +1,523 @@
@@ -638,7 +638,7 @@ index 0000000..f4ac16c
 +
 +	if (alloc_args.drm_format == 0) {
 +		/* Always use linear for spoofed format allocations. */
-+		drv_bo_from_format(bo, alloc_args.width, alloc_args.height, format);
++		drv_bo_from_format(bo, alloc_args.width, 1, alloc_args.height, format);
 +		bo_layout_ready = true;
 +		bo->meta.total_size = ALIGN(bo->meta.total_size, size_align);
 +		alloc_args.drm_format = DRM_FORMAT_R8;
@@ -674,16 +674,16 @@ index 0000000..f4ac16c
 +	}
 +
 +	if (!bo_layout_ready)
-+		drv_bo_from_format(bo, alloc_args.out_stride, alloc_args.height, format);
++		drv_bo_from_format(bo, alloc_args.out_stride, 1, alloc_args.height, format);
 +
 +	drv_logv("Allocated: %dx%d, stride: %d, map_stride: %d", width, height,
 +		 alloc_args.out_stride, alloc_args.out_map_stride);
 +
 +	auto priv = new GbmMesaBoPriv();
-+	uint32_t inode = drv_get_inode(alloc_args.out_fd);
++	bo->inode = drv_get_inode(alloc_args.out_fd);
 +	for (size_t plane = 0; plane < bo->meta.num_planes; plane++) {
 +		priv->fds[plane] = UniqueFd(alloc_args.out_fd);
-+		bo->inodes[plane] = inode;
++
 +	}
 +
 +	priv->map_stride = alloc_args.out_map_stride;
@@ -744,7 +744,7 @@ index 0000000..f4ac16c
 +	return dup(((GbmMesaBoPriv *)bo->priv)->fds[plane].Get());
 +}
 +
-+void *gbm_mesa_bo_map(struct bo *bo, struct vma *vma, size_t plane, uint32_t map_flags)
++void *gbm_mesa_bo_map(struct bo *bo, struct vma *vma, uint32_t map_flags)
 +{
 +	auto drv = gbm_mesa_get_or_init_driver(bo->drv, true);
 +	auto wr = drv->wrapper;
@@ -790,7 +790,7 @@ index 0000000..f4ac16c
 +}
 diff --git a/gbm_mesa_driver/gbm_mesa_internals.h b/gbm_mesa_driver/gbm_mesa_internals.h
 new file mode 100644
-index 0000000..ed53364
+index 0000000..4a8ac9d
 --- /dev/null
 +++ b/gbm_mesa_driver/gbm_mesa_internals.h
 @@ -0,0 +1,52 @@
@@ -842,7 +842,7 @@ index 0000000..ed53364
 +int gbm_mesa_bo_destroy(struct bo *bo);
 +
 +uint32_t gbm_mesa_bo_get_map_stride(struct bo *bo);
-+void *gbm_mesa_bo_map(struct bo *bo, struct vma *vma, size_t plane, uint32_t map_flags);
++void *gbm_mesa_bo_map(struct bo *bo, struct vma *vma, uint32_t map_flags);
 +int gbm_mesa_bo_unmap(struct bo *bo, struct vma *vma);
 +
 +int gbm_mesa_bo_get_plane_fd(struct bo *bo, size_t plane);

@@ -1,7 +1,7 @@
-From e5ba1017ecc88cc5abaa44481fab39804679d335 Mon Sep 17 00:00:00 2001
+From 8c5617853415b70b13e201e7098a5cd487b537e6 Mon Sep 17 00:00:00 2001
 From: Roman Stratiienko <r.stratiienko@gmail.com>
 Date: Wed, 23 Jun 2021 17:10:34 +0300
-Subject: [PATCH 02/13] minigbm: Add external driver support
+Subject: [PATCH 02/18] minigbm: Add external driver support
 
 Allow backends with custom DRM probing logic or
 backends that does not rely on DRM (dma-heap, ION).
@@ -14,10 +14,10 @@ Change-Id: I7bcaf10205ca051eb109d6e220b8a2af38267442
  2 files changed, 22 insertions(+), 1 deletion(-)
 
 diff --git a/cros_gralloc/cros_gralloc_driver.cc b/cros_gralloc/cros_gralloc_driver.cc
-index 10ed89a..c8982bd 100644
+index 7bc1620..3536306 100644
 --- a/cros_gralloc/cros_gralloc_driver.cc
 +++ b/cros_gralloc/cros_gralloc_driver.cc
-@@ -72,6 +72,7 @@ cros_gralloc_driver *cros_gralloc_driver::get_instance()
+@@ -89,6 +89,7 @@ cros_gralloc_driver *cros_gralloc_driver::get_instance()
  	return &s_instance;
  }
  
@@ -25,7 +25,7 @@ index 10ed89a..c8982bd 100644
  static struct driver *init_try_node(int idx, char const *str)
  {
  	int fd;
-@@ -129,11 +130,21 @@ static struct driver *init_try_nodes()
+@@ -146,11 +147,21 @@ static struct driver *init_try_nodes()
  	return nullptr;
  }
  
@@ -49,7 +49,7 @@ index 10ed89a..c8982bd 100644
  
  cros_gralloc_driver::cros_gralloc_driver() : drv_(init_try_nodes(), drv_destroy_and_close)
 diff --git a/drv.c b/drv.c
-index 83656a9..1a8a21e 100644
+index 52abe26..59996bf 100644
 --- a/drv.c
 +++ b/drv.c
 @@ -24,6 +24,15 @@
@@ -68,7 +68,7 @@ index 83656a9..1a8a21e 100644
  #ifdef DRV_AMDGPU
  extern const struct backend backend_amdgpu;
  #endif
-@@ -92,6 +101,7 @@ static const struct backend *drv_get_backend(int fd)
+@@ -102,6 +111,7 @@ static const struct backend *drv_get_backend(int fd)
  	drmFreeVersion(drm_version);
  	return NULL;
  }

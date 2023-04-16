@@ -1,7 +1,7 @@
-From 72d82dfe995b161ab9a9dd7da7cc76ca6fecbeac Mon Sep 17 00:00:00 2001
+From 6f8c127e152d98b30e9fe9dbe1d4ea7414c18a80 Mon Sep 17 00:00:00 2001
 From: Roman Stratiienko <r.stratiienko@gmail.com>
 Date: Sun, 25 Sep 2022 19:22:53 +0300
-Subject: [PATCH 1/2] dma_heaps: Constraints for RPI4
+Subject: [PATCH 16/18] dma_heaps: Constraints for RPI4
 
 Change-Id: Icce8164cde8da483d683c06a4936ffde05b6f515
 Signed-off-by: Roman Stratiienko <r.stratiienko@gmail.com>
@@ -10,7 +10,7 @@ Signed-off-by: Roman Stratiienko <r.stratiienko@gmail.com>
  1 file changed, 64 insertions(+), 11 deletions(-)
 
 diff --git a/dmabuf_driver/dmabuf_internals.cpp b/dmabuf_driver/dmabuf_internals.cpp
-index 3c1e236..a426fe4 100644
+index a14da3d..3717ea0 100644
 --- a/dmabuf_driver/dmabuf_internals.cpp
 +++ b/dmabuf_driver/dmabuf_internals.cpp
 @@ -63,11 +63,6 @@ static struct format_metadata linear_metadata = { 1, 0, DRM_FORMAT_MOD_LINEAR };
@@ -29,7 +29,7 @@ index 3c1e236..a426fe4 100644
  		return -EINVAL;
  
  	int stride = drv_stride_from_format(format, width, 0);
--	drv_bo_from_format(bo, stride, height, format);
+-	drv_bo_from_format(bo, stride, 1, height, format);
  
 -	struct dma_heap_allocation_data heap_data {
 -		.len = bo->meta.total_size, .fd_flags = O_RDWR | O_CLOEXEC,
@@ -71,7 +71,7 @@ index 3c1e236..a426fe4 100644
 +		// TODO: GPU-only buffers can be made tiled, but calculations are too complex
 +	}
 +
-+	drv_bo_from_format(bo, stride, height, format);
++	drv_bo_from_format(bo, stride, 1, height, format);
 +
 +	struct dma_heap_allocation_data heap_data {
 +		.len = ALIGN(bo->meta.total_size, size_align), .fd_flags = O_RDWR | O_CLOEXEC,
@@ -104,9 +104,9 @@ index 3c1e236..a426fe4 100644
 +		drv_loge("DMA_BUF_SET_NAME failed");
 +
  	auto priv = new DmabufBoPriv();
- 	uint32_t inode = drv_get_inode(buf_fd.Get());
+ 	bo->inode = drv_get_inode(buf_fd.Get());
  	for (size_t plane = 0; plane < bo->meta.num_planes; plane++) {
-@@ -250,11 +291,23 @@ void *dmabuf_bo_map(struct bo *bo, struct vma *vma, size_t plane, uint32_t map_f
+@@ -250,11 +291,23 @@ void *dmabuf_bo_map(struct bo *bo, struct vma *vma, uint32_t map_flags)
  		return buf;
  	}
  
