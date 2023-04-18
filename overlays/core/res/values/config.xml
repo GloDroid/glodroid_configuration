@@ -43,4 +43,7 @@
          dim before the device goes to sleep.
     -->
     <fraction name="config_maximumScreenDimRatio">40%</fraction>
+
+    <bool name="config_useDevInputEventForAudioJack">true</bool>
+
 </resources>
