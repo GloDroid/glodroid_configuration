@@ -13,8 +13,10 @@ PRODUCT_PACKAGES += \
     audio.r_submix.default \
     tinyalsa tinymix tinycap tinypcminfo tinyplay \
 
+GD_AUDIOPOLICY_FILE ?= $(LOCAL_PATH)/audio_policy_configuration.xml
+
 PRODUCT_COPY_FILES += \
-    glodroid/configuration/common/audio/audio_policy_configuration.xml:$(TARGET_COPY_OUT_VENDOR)/etc/audio_policy_configuration.xml \
+    $(GD_AUDIOPOLICY_FILE):$(TARGET_COPY_OUT_VENDOR)/etc/audio_policy_configuration.xml \
     frameworks/av/services/audiopolicy/config/a2dp_audio_policy_configuration_7_0.xml:$(TARGET_COPY_OUT_VENDOR)/etc/a2dp_audio_policy_configuration_7_0.xml \
     frameworks/av/services/audiopolicy/config/a2dp_in_audio_policy_configuration_7_0.xml:$(TARGET_COPY_OUT_VENDOR)/etc/a2dp_in_audio_policy_configuration_7_0.xml \
     frameworks/av/services/audiopolicy/config/bluetooth_audio_policy_configuration_7_0.xml:$(TARGET_COPY_OUT_VENDOR)/etc/bluetooth_audio_policy_configuration_7_0.xml \
