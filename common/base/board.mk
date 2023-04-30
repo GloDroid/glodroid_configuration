@@ -130,6 +130,10 @@ ifeq ($(PRODUCT_BOARD_PLATFORM),rockchip)
 BOARD_KERNEL_BASE     := 0x2000000
 BOARD_KERNEL_SRC_DIR  ?= glodroid/kernel/common-android13-5.15-lts
 endif
+ifeq ($(PRODUCT_BOARD_PLATFORM),amlogic)
+BOARD_KERNEL_BASE     := 0x8000000
+BOARD_KERNEL_SRC_DIR  ?= glodroid/kernel/common-android13-5.15-lts
+endif
 BOARD_KERNEL_PAGESIZE := 4096
 BOARD_KERNEL_CMDLINE  := androidboot.hardware=$(TARGET_PRODUCT)
 BOARD_MKBOOTIMG_ARGS  += --kernel_offset 0x80000 --second_offset 0x8800 --ramdisk_offset 0x3300000

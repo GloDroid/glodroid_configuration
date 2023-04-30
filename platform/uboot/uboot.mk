@@ -89,6 +89,14 @@ SYSFS_MMC0_PATH ?= fe330000.sdhci
 SYSFS_MMC1_PATH ?= fe320000.mmc
 endif
 
+ifeq ($(PRODUCT_BOARD_PLATFORM),amlogic)
+UBOOT_FRAGMENTS	+= glodroid/configuration/platform/common/amlogic/uboot.config
+UBOOT_EMMC_DEV_INDEX := 2
+UBOOT_SD_DEV_INDEX := 1
+POST_PROCESS_SCRIPT := glodroid/configuration/platform/common/amlogic/post-process-bootloader.sh
+UBOOT_BINARY := $(UBOOT_OUT)/u-boot.bin
+endif
+
 $(UBOOT_FRAGMENT_EMMC):
 	echo "CONFIG_FASTBOOT_FLASH_MMC_DEV=$(UBOOT_EMMC_DEV_INDEX)" > $@
 
@@ -204,6 +212,18 @@ $(PRODUCT_OUT)/bootloader-sd.img: $(UBOOT_BINARY) $(OVERLAY_FILES) $(ATF_BINARY)
 	/usr/bin/mcopy -i $@ $(BOOT_FILES) ::
 	/usr/bin/mmd -i $@ ::overlays
 	/usr/bin/mcopy -i $@ $(OVERLAY_FILES) ::overlays/
+endif
+
+ifeq ($(PRODUCT_BOARD_PLATFORM),amlogic)
+$(PRODUCT_OUT)/bootloader-emmc.img: $(UBOOT_BINARY) $(POST_PROCESS_SCRIPT)
+	$(POST_PROCESS_SCRIPT) $(AMLOGIC_FIP_FILES) $(AMLOGIC_FIP_SOC_FAMILY) $@.tmp $<.emmc SD
+	dd if=$@.tmp of=$@ bs=512 skip=1
+	rm -f $@.tmp
+
+$(PRODUCT_OUT)/bootloader-sd.img: $(UBOOT_BINARY) $(POST_PROCESS_SCRIPT)
+	$(POST_PROCESS_SCRIPT) $(AMLOGIC_FIP_FILES) $(AMLOGIC_FIP_SOC_FAMILY) $@.tmp $<.sd SD
+	dd if=$@.tmp of=$@ bs=512 skip=1
+	rm -f $@.tmp
 endif
 
 ifneq ($(PRODUCT_HAS_EMMC),)
