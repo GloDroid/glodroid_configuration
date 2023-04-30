@@ -19,10 +19,12 @@ CROSS_COMPILE := prebuilts/gcc/linux-x86/aarch64/gcc-linaro-$(TRIPLE)/bin/$(TRIP
 # Common for ATF and u-boot
 ATF_OUT		:= $(PRODUCT_OUT)/obj/ATF_OBJ
 
+ifneq ($(ATF_PLAT),)
 ifeq ($(PRODUCT_BOARD_PLATFORM),rockchip)
 ATF_BINARY  := $(ATF_OUT)/$(ATF_PLAT)/debug/bl31/bl31.elf
 else
 ATF_BINARY	:= $(ATF_OUT)/$(ATF_PLAT)/debug/bl31.bin
+endif
 endif
 
 ifeq ($(PRODUCT_BOARD_PLATFORM),sunxi)

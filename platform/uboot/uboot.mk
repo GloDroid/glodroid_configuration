@@ -30,7 +30,9 @@ UBOOT_KCFLAGS = \
     $(TARGET_BOOTLOADER_CFLAGS)
 
 ifeq ($(TARGET_ARCH),arm64)
+ifneq ($(ATF_PLAT),)
 BL31_SET := BL31=$(AOSP_TOP_ABS)/$(ATF_BINARY)
+endif
 endif
 
 ifeq ($(PRODUCT_BOARD_PLATFORM),sunxi)
