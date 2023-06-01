@@ -8,9 +8,7 @@ BCC_PATH := $(patsubst $(CURDIR)/%,%,$(dir $(abspath $(lastword $(MAKEFILE_LIST)
 
 BOARD_BUILD_AOSPEXT_LIBCAMERA := true
 BOARD_LIBCAMERA_SRC_DIR := glodroid/vendor/libcamera
-BOARD_LIBCAMERA_PATCHES_DIRS := $(BCC_PATH)/patches-libcamera
-BOARD_LIBCAMERA_IPAS := raspberrypi
-BOARD_LIBCAMERA_PIPELINES := simple raspberrypi
+BOARD_LIBCAMERA_PIPELINES ?= simple
 
 DEVICE_MANIFEST_FILE += $(BCC_PATH)/android.hardware.camera.provider@2.5.xml
 
