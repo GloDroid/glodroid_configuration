@@ -1,124 +1,80 @@
 #!/bin/bash -e
+#
+# SPDX-License-Identifier: GPL-3.0-or-later
+#
+# GloDroid project (https://github.com/GloDroid)
+#
+# use PARTED_TOOL=<path-to-parted.py> ./gensdimg.sh -P=<platform> -T=<type> -C=<out_directory>
+#
+# <platform>: amlogic, rockchip, sunxi, broadcom
+# <type>: SD, DEPLOY-SD, DEPLOY-SD-FOR-EMMC
+# <out_directory>: output directory, i.e. out/target/product/generic_x86_64
 
-PLATFORM=sunxi
+PARTED_TOOL="$(pwd)/${PARTED_TOOL:-./parted.py}"
+PLATFORM=
+TYPE=SD
+SUFFIX=sd
+SDIMG=sdcard.img
 
-# Old Allwinner boot ROM looks for the SPL binary starting from 16th LBA of SDCARD and EMMC.
-# Newer Alwinner SOCs including H3, A64, and later is looking for SPL at both 16th LBA and 256th LBA.
-# Align first partition to 256th LBA to allow update bootloader binaries using fastboot.
-PART_START=$(( 256 * 512 ))
+gen_image() {
+    local BASE_ARGS="--disk-image=$SDIMG"
 
-# 1 MiB alignment is relevant for USB flash devices. Follow that rules to improve
-# read performance when using SDCARD with USB card reader.
-ALIGN=$(( 2048 * 512 ))
+    rm -f $SDIMG
 
-PTR=$PART_START
-pn=1
+    if [ "$TYPE" = "DEPLOY-SD-FOR-EMMC" ]; then
+        SUFFIX=emmc
+    fi
 
-add_part() {
-	echo -e "\033[95m===> Adding partition $1, image $2, size=$3, offset=$PTR\033[0m"
+    if [ "$PLATFORM" = "amlogic" ]; then
+        BASE_ARGS+=" --gpt-offset=2M" # Default LBA1 is occupied by Amlogic bootloader, so we need to move GPT to 2MB offset
+        #BASE_ARGS+=" --no-mbr" # Amlogic bootloader-sd.img contains some sort of MBR and must be written to LBA0
+        BL_START=512
+        BL_SIZE=$(( 1024 * 1024 * 2 - 512 ))
+    fi
 
-	SIZE=$3
-	if [ -z "$SIZE" ]; then
-	    SIZE=$(stat $2 -c%s)
-	fi
+    if [ "$PLATFORM" = "rockchip" ]; then
+        BL_START=32K
+        BL_SIZE=$(( 1024 * 1024 * 2 - 32 * 1024 ))
+    fi
 
-	SGCMD="--new $pn:$(( PTR / 512 )):$(( ($PTR + $SIZE - 1) / 512 ))"
+    if [ "$PLATFORM" = "sunxi" ]; then
+        BL_START=128K
+        BL_SIZE=$(( 1024 * 1024 * 2 - 128 * 1024 ))
+    fi
 
-	sgdisk --set-alignment=1 $SGCMD --change-name=$pn:"$1" ${SDIMG}
-
-	dd if=$2 of=$SDIMG bs=4k count=$(( SIZE / 4096 )) seek=$(( $PTR / 4096 )) conv=notrunc && sync
-
-	PTR=$(( ($PTR + $SIZE + $ALIGN - 1) / $ALIGN * $ALIGN ))
-	pn=$(( $pn + 1 ))
-}
-
-add_empty_part() {
-	SIZE=$2
-	echo -e "\033[95m===> Adding empty partition $1: size=$SIZE, offset=$PTR\033[0m"
-
-	if [ "$SIZE" != "-" ]; then
-	    SGCMD="--new $pn:$(( PTR / 512 )):$(( ($PTR + $SIZE - 1) / 512 ))"
-	else
-	    SGCMD="--largest-new=$pn"
-	fi
-
-	sgdisk --set-alignment=1 $SGCMD --change-name=$pn:"$1" ${SDIMG}
-
-	PTR=$(( ($PTR + $SIZE + $ALIGN - 1) / $ALIGN * $ALIGN ))
-	pn=$(( $pn + 1 ))
-}
-
-prepare_disk() {
-    if [ -e "$SDIMG" ]; then
-        SDSIZE=$(stat $SDIMG -c%s)
+    if [ "$TYPE" != "SD" ]; then
+        ${PARTED_TOOL} create_empty  ${BASE_ARGS} --size=256M
     else
-        SDSIZE=$(( 1024 * 1024 * $1 ))
-        echo "===> Create raw disk image"
-        dd if=/dev/zero of=$SDIMG bs=4096 count=$(( $SDSIZE / 4096 ))
-    fi;
+        ${PARTED_TOOL} create_empty  ${BASE_ARGS} --size=4G
+    fi
 
-    echo "===> Clean existing partition table"
-    sgdisk --zap-all $SDIMG
-}
-
-modify_for_rpi() {
-    echo "===> Transforming GPT to hybrid partition table"
-    gdisk $SDIMG <<EOF
-r
-h
-1
-n
-04
-y
-n
-m
-w
-y
-EOF
-}
-
-gen_sd() {
-    prepare_disk $(( 1024 * 4 )) # Default size - 4 GB
-
-    echo "===> Add partitions"
-    add_part       bootloader      bootloader-sd.img
-    add_part       uboot-env       env.img
-    add_empty_part misc                                  $(( 512 * 1024 ))
-    add_part       boot_a          boot.img        $(( 64 * 1024 * 1024 ))
-    add_empty_part boot_b                          $(( 64 * 1024 * 1024 ))
-    add_part       vendor_boot_a   vendor_boot.img $(( 32 * 1024 * 1024 ))
-    add_empty_part vendor_boot_b                   $(( 32 * 1024 * 1024 ))
-    add_part       dtbo_a          boot_dtbo.img    $(( 8 * 1024 * 1024 ))
-    add_empty_part dtbo_b                           $(( 8 * 1024 * 1024 ))
-    add_part       vbmeta_a        vbmeta.img            $(( 512 * 1024 ))
-    add_empty_part vbmeta_b                              $(( 512 * 1024 ))
-    add_part       vbmeta_system_a vbmeta_system.img     $(( 512 * 1024 ))
-    add_empty_part vbmeta_system_b                       $(( 512 * 1024 ))
-    add_part       super           super.img
-    add_empty_part metadata                        $(( 16 * 1024 * 1024 ))
-    add_empty_part userdata_placeholder -
+    ${PARTED_TOOL} add_image     ${BASE_ARGS} --partition-name=bootloader --start=${BL_START} --size=${BL_SIZE} --img-file=bootloader-$SUFFIX.img
+    ${PARTED_TOOL} add_image     ${BASE_ARGS} --partition-name=uboot-env  --start=3M          --size=512K       --img-file=env.img
 
     if [ "$PLATFORM" = "broadcom" ]; then
-        modify_for_rpi
+        # Broadcom ROM code will look for a FAT16 partition on MBR (It doesn't support GPT). Therefore, create a hybrid MBR.
+        ${PARTED_TOOL} set_as_mbr_partition ${BASE_ARGS} --partition-name=bootloader
     fi
-}
 
-gen_deploy() {
-    local SUFFIX=$1
-    prepare_disk $(( 256 )) # Default size - 256 MB
-
-    echo "===> Add partitions"
-    if [ "$PLATFORM" = "rockchip" ] && [ "$SUFFIX" == "emmc" ]; then
-        add_part bootloader bootloader-deploy-emmc.img
-    else
-        add_part bootloader bootloader-$SUFFIX.img
+    # Skip remaining for deploy images
+    if [ "$TYPE" != "SD" ]; then
+        return
     fi
-    add_part uboot-env env.img
-    add_part recovery_boot boot.img
 
-    if [ "$PLATFORM" = "broadcom" ]; then
-        modify_for_rpi
-    fi
+    ${PARTED_TOOL} add_partition ${BASE_ARGS} --partition-name=misc                  --size=512K
+    ${PARTED_TOOL} add_image     ${BASE_ARGS} --partition-name=boot_a                --size=64M  --img-file=boot.img
+    ${PARTED_TOOL} add_partition ${BASE_ARGS} --partition-name=boot_b                --size=64M
+    ${PARTED_TOOL} add_image     ${BASE_ARGS} --partition-name=vendor_boot_a         --size=32M  --img-file=vendor_boot.img
+    ${PARTED_TOOL} add_partition ${BASE_ARGS} --partition-name=vendor_boot_b         --size=32M
+    ${PARTED_TOOL} add_image     ${BASE_ARGS} --partition-name=dtbo_a                --size=8M   --img-file=boot_dtbo.img
+    ${PARTED_TOOL} add_partition ${BASE_ARGS} --partition-name=dtbo_b                --size=8M
+    ${PARTED_TOOL} add_image     ${BASE_ARGS} --partition-name=vbmeta_a              --size=512K --img-file=vbmeta.img
+    ${PARTED_TOOL} add_partition ${BASE_ARGS} --partition-name=vbmeta_b              --size=512K
+    ${PARTED_TOOL} add_image     ${BASE_ARGS} --partition-name=vbmeta_system_a       --size=512K --img-file=vbmeta_system.img
+    ${PARTED_TOOL} add_partition ${BASE_ARGS} --partition-name=vbmeta_system_b       --size=512K
+    ${PARTED_TOOL} add_image     ${BASE_ARGS} --partition-name=super                             --img-file=super.img
+    ${PARTED_TOOL} add_partition ${BASE_ARGS} --partition-name=metadata              --size=16M
+    ${PARTED_TOOL} add_partition ${BASE_ARGS} --partition-name=userdata_placeholder
 }
 
 for i in "$@"
@@ -141,27 +97,18 @@ case $i in
 esac
 done
 
-if [ "$PLATFORM" = "rockchip" ]; then
-    PART_START=$(( 64 * 512 ))
-    PTR=$PART_START
-fi
-
 if [[ -n $1 ]]; then
     SDIMG=$1
 else
     SDIMG=sdcard.img
 fi
 
-case $TYPE in
-    DEPLOY-SD)
-    gen_deploy "sd"
-    ;;
-    DEPLOY-SD-FOR-EMMC)
-    gen_deploy "emmc"
-    ;;
-    SD|*)
-    gen_sd
-    ;;
-esac
+# Check if we have PLATFORM defined
+if [ -z "$PLATFORM" ]; then
+    echo -e "\033[31m\n   ERROR: PLATFORM is not defined\033[0m"
+    exit 1
+fi
+
+gen_image
 
 echo -e "\033[32m\n   DONE\033[0m"

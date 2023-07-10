@@ -1,4 +1,5 @@
 GENSDIMG := $(PLATFORM_PATH)/tools/gensdimg.sh
+PARTED := $(PLATFORM_PATH)/tools/parted.py
 
 NATIVE_PATH := PATH=/sbin:/bin:/usr/bin:$$PATH
 
@@ -45,21 +46,21 @@ $(PRODUCT_OUT)/flash-emmc.sh: $(PLATFORM_PATH)/tools/flash-all.sh
 	cp $< $@
 	sed -i "s/__SUFFIX__/-emmc/g" $@
 
-$(PRODUCT_OUT)/deploy-sd.img: $(GENSDIMG) $(DEPLOY_BOOTLOADER) $(PRODUCT_OUT)/boot.img
+$(PRODUCT_OUT)/deploy-sd.img: $(GENSDIMG) $(PARTED) $(DEPLOY_BOOTLOADER) $(PRODUCT_OUT)/boot.img
 	rm -f $@
-	$(NATIVE_PATH) $< -C=$(PRODUCT_OUT) -T=DEPLOY-SD -P=$(PRODUCT_BOARD_PLATFORM) $(notdir $@)
+	$(NATIVE_PATH) PARTED_TOOL=$(PARTED) $< -C=$(PRODUCT_OUT) -T=DEPLOY-SD -P=$(PRODUCT_BOARD_PLATFORM) $(notdir $@)
 
-$(PRODUCT_OUT)/deploy-sd-for-emmc.img: $(GENSDIMG) $(DEPLOY_BOOTLOADER) $(PRODUCT_OUT)/boot.img
+$(PRODUCT_OUT)/deploy-sd-for-emmc.img: $(GENSDIMG) $(PARTED) $(DEPLOY_BOOTLOADER) $(PRODUCT_OUT)/boot.img
 	rm -f $@
-	$(NATIVE_PATH) $< -C=$(PRODUCT_OUT) -T=DEPLOY-SD-FOR-EMMC -P=$(PRODUCT_BOARD_PLATFORM) $(notdir $@)
+	$(NATIVE_PATH) PARTED_TOOL=$(PARTED) $< -C=$(PRODUCT_OUT) -T=DEPLOY-SD-FOR-EMMC -P=$(PRODUCT_BOARD_PLATFORM) $(notdir $@)
 
-$(PRODUCT_OUT)/deploy-gpt.img: $(PRODUCT_OUT)/deploy-sd.img $(GENSDIMG)
+$(PRODUCT_OUT)/deploy-gpt.img: $(PRODUCT_OUT)/deploy-sd.img $(GENSDIMG) $(PARTED)
 	dd if=$< of=$@ bs=1k count=128
 
-$(PRODUCT_OUT)/sdcard.img: $(GENSDIMG) $(DEPLOY_FILES)
+$(PRODUCT_OUT)/sdcard.img: $(GENSDIMG) $(PARTED) $(DEPLOY_FILES)
 	$(call pretty,"Creating sdcard image...")
 	rm -f $@
-	$(NATIVE_PATH) $< -C=$(PRODUCT_OUT) -T=SD -P=$(PRODUCT_BOARD_PLATFORM)
+	$(NATIVE_PATH) PARTED_TOOL=$(PARTED) $< -C=$(PRODUCT_OUT) -T=SD -P=$(PRODUCT_BOARD_PLATFORM)
 
 .PHONY: sdcard
 sdcard: $(PRODUCT_OUT)/sdcard.img
