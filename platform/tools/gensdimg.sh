@@ -42,6 +42,11 @@ gen_image() {
         BL_SIZE=$(( 1024 * 1024 * 2 - 128 * 1024 ))
     fi
 
+    if [ "$PLATFORM" = "broadcom" ]; then
+        BL_START=128K
+        BL_SIZE=$(( 1024 * 1024 * 128 - 128 * 1024 ))
+    fi
+
     if [ "$TYPE" != "SD" ]; then
         ${PARTED_TOOL} create_empty  ${BASE_ARGS} --size=256M
     else
@@ -49,11 +54,11 @@ gen_image() {
     fi
 
     ${PARTED_TOOL} add_image     ${BASE_ARGS} --partition-name=bootloader --start=${BL_START} --size=${BL_SIZE} --img-file=bootloader-$SUFFIX.img
-    ${PARTED_TOOL} add_image     ${BASE_ARGS} --partition-name=uboot-env  --start=3M          --size=512K       --img-file=env.img
+    ${PARTED_TOOL} add_image     ${BASE_ARGS} --partition-name=uboot-env                      --size=512K       --img-file=env.img
 
     if [ "$PLATFORM" = "broadcom" ]; then
         # Broadcom ROM code will look for a FAT16 partition on MBR (It doesn't support GPT). Therefore, create a hybrid MBR.
-        ${PARTED_TOOL} set_as_mbr_partition ${BASE_ARGS} --partition-name=bootloader
+        ${PARTED_TOOL} set_as_mbr_partition ${BASE_ARGS} --partition-name=bootloader --part-type=0x4
     fi
 
     # Skip remaining for deploy images

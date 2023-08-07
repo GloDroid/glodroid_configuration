@@ -142,6 +142,12 @@ def lba_to_chs(lba, sectors_per_track, heads):
     remainder = lba % sectors_per_cylinder
     head = remainder // sectors_per_track
     sector = (remainder % sectors_per_track) + 1  # Sectors are usually 1-indexed in CHS notation
+    if cylinder > 1023:
+        # We cannot represent more than 1023 cylinders in CHS notation
+        cylinder = 1023
+        head = heads
+        sector = sectors_per_track
+
     return struct.pack("BBB", head, ((cylinder >> 8) << 6) | sector, cylinder & 0xff)
 
 def store_protected_mbr(disk_image, hybrid_part_name, hybrid_part_type):
@@ -218,7 +224,7 @@ def create_empty_gpt_header_and_table(disk_image):
     num_part_entries = 128
     part_entry_size = 128
     part_entry_array_crc32 = 0
-    first_usable_lba = div_round_up(gpt_offset + num_part_entries * part_entry_size, 512)
+    first_usable_lba = div_round_up(gpt_offset + 512 + num_part_entries * part_entry_size, 512)
     last_usable_lba = backup_lba - 33
 
     gpt_header = (signature, revision, header_size, crc32, reserved, current_lba, backup_lba, first_usable_lba, last_usable_lba, disk_guid, part_entry_start_lba, num_part_entries, part_entry_size, part_entry_array_crc32)
@@ -271,11 +277,11 @@ def create_empty_partition(disk_image, partition_name, start, size):
             sys.exit(1)
 
         if start + size > r[0] and start + size <= r[1]:
-            print("FAIL: Partition end overlaps with an existing segment: {r[2]}")
+            print(f"FAIL: Partition end overlaps with an existing segment: {r[2]}")
             sys.exit(1)
 
         if start < r[0] and start + size > r[1]:
-            print("FAIL: Partition overlaps with an existing segment: {r[2]}")
+            print(f"FAIL: Partition overlaps with an existing segment: {r[2]}")
             sys.exit(1)
 
     # Create a new partition entry
