@@ -136,9 +136,10 @@ $(BOOTSCRIPT_GEN): $(GD_BOOTSCRIPT) $(BSP_UBOOT_PATH)/bootscript.h $(GD_BOOTSCRI
 	cp $(BSP_UBOOT_PATH)/bootscript.h $(dir $(BOOTSCRIPT_GEN))/
 	cp $(GD_BOOTSCRIPT_OVERLAY_PLATFORM) $(dir $(BOOTSCRIPT_GEN))/platform.h
 	cp $(GD_BOOTSCRIPT_OVERLAY_DEVICE) $(dir $(BOOTSCRIPT_GEN))/device.h
-	$(CLANG) -E -P -Wno-invalid-pp-token $(dir $(BOOTSCRIPT_GEN))/$(notdir $<) -o $@ \
+	$(CLANG) -E -P -Wno-invalid-pp-token -Wno-reserved-user-defined-literal $(dir $(BOOTSCRIPT_GEN))/$(notdir $<) -o $@ \
 	    -D__SYSFS_MMC0_PATH__=$(SYSFS_MMC0_PATH) \
 	    -D__SYSFS_MMC1_PATH__=$(SYSFS_MMC1_PATH) \
+	    -D__GD_SUPER_PARTITION_SIZE_MB__=$(GD_SUPER_PARTITION_SIZE_MB) \
 
 $(UBOOT_OUT)/boot.scr: $(BOOTSCRIPT_GEN) $(UBOOT_BINARY)
 	$(UBOOT_OUT)/tools/mkimage -A arm -O linux -T script -C none -a 0 -e 0 -d $< $@

@@ -101,8 +101,15 @@ BOARD_BUILD_SYSTEM_ROOT_IMAGE := false
 
 BOARD_EXT4_SHARE_DUP_BLOCKS := true
 
+# Default suprt partition size
+ifeq ($(wildcard lineage),lineage)
+GD_SUPER_PARTITION_SIZE_MB ?= 2500
+else
+GD_SUPER_PARTITION_SIZE_MB ?= 2000
+endif
+
 # Dynamic partition 1800 MiB
-BOARD_SUPER_PARTITION_SIZE := $(shell echo $$(( 2000 * 1024 * 1024 )))
+BOARD_SUPER_PARTITION_SIZE := $(shell echo $$(( $(GD_SUPER_PARTITION_SIZE_MB) * 1024 * 1024 )))
 BOARD_BUILD_SUPER_IMAGE_BY_DEFAULT := true
 BOARD_SUPER_PARTITION_GROUPS := glodroid_dynamic_partitions
 BOARD_GLODROID_DYNAMIC_PARTITIONS_SIZE := $(shell echo $$(( $(BOARD_SUPER_PARTITION_SIZE) - (10 * 1024 * 1024) )))

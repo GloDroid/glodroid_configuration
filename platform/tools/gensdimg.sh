@@ -50,7 +50,11 @@ gen_image() {
     if [ "$TYPE" != "SD" ]; then
         ${PARTED_TOOL} create_empty  ${BASE_ARGS} --size=256M
     else
-        ${PARTED_TOOL} create_empty  ${BASE_ARGS} --size=4G
+        # Adjust SD card size to fit super.img and other partitions
+        SUPER_IMG_SIZE_MB=$(( $(stat -c%s super.img) / (1024 * 1024) ))
+        # Add 512M for remaining partitions. Align to 1G.
+        SD_SIZE_GB=$(( (SUPER_IMG_SIZE_MB + 512 + 1024 - 1) / 1024 ))
+        ${PARTED_TOOL} create_empty  ${BASE_ARGS} --size=${SD_SIZE_GB}G
     fi
 
     ${PARTED_TOOL} add_image     ${BASE_ARGS} --partition-name=bootloader --start=${BL_START} --size=${BL_SIZE} --img-file=bootloader-$SUFFIX.img

@@ -6,6 +6,8 @@
 #define N(...) __VA_ARGS__
 #define Q() \"
 
+#define q() "
+
 #define BO() "${
 #define BOQ() "\${
 #define BC() }"
@@ -16,5 +18,6 @@
 #define FUNC_BEGIN(name) setenv name '
 #define FUNC_END() '
 
+#define STR(...) q()N(__VA_ARGS__)q()
 #define STRESC(...) Q()N(__VA_ARGS__)Q()
 
