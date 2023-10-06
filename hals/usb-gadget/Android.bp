@@ -36,5 +36,5 @@ cc_binary {
         "liblog",
         "libutils",
     ],
-    static_libs: ["libusbconfigfs-2-gd"],
+    static_libs: ["libusbconfigfs-2"],
 }
