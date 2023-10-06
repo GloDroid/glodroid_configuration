@@ -66,7 +66,7 @@ ANDROID_DTS_OVERLAY	?= $(LOCAL_PATH)/empty.dts
 
 ANDROID_DTBO		:= $(PRODUCT_OUT)/obj/GLODROID/DTBO/fstab-android-sdcard.dtbo
 BOARD_PREBUILT_DTBOIMAGE := $(PRODUCT_OUT)/boot_dtbo.img
-MKDTBOIMG		:= $(HOST_OUT_EXECUTABLES)/mkdtboimg.py
+MKDTBOIMG		:= $(HOST_OUT_EXECUTABLES)/mkdtboimg
 GEN_DTBCFG		:= $(PRODUCT_OUT)/gen/DTBO/dtbo.cfg
 
 $(TARGET_VENDOR_MODULES)/modules.dep: $(KERNEL_TARGET)
