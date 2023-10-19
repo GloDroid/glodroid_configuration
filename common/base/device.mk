@@ -74,3 +74,5 @@ PRODUCT_PACKAGES += \
     update_engine_client \
     update_verifier \
     update_engine_sideload \
+
+TARGET_FLATTEN_APEX := true
