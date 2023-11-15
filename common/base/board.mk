@@ -170,4 +170,4 @@ BOARD_USES_GLODROID_MAKE_TARGETS := true
 
 BOARD_BUILD_GLODROID_KERNEL := true
 
-RUST_BIN_DIR := glodroid/compilers/rust/1.65.0/bin
+RUST_BIN_DIR := prebuilts/rust/linux-x86/1.68.0/bin
