@@ -24,6 +24,7 @@ set -x
 ./fastboot flash vbmeta_a        vbmeta.img
 ./fastboot flash vbmeta_system_a vbmeta_system.img
 ./fastboot erase misc
+./fastboot erase frp
 
 ./fastboot reboot-fastboot
 

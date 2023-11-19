@@ -71,6 +71,7 @@ gen_image() {
     fi
 
     ${PARTED_TOOL} add_partition ${BASE_ARGS} --partition-name=misc                  --size=512K
+    ${PARTED_TOOL} add_partition ${BASE_ARGS} --partition-name=frp                   --size=512K
     ${PARTED_TOOL} add_image     ${BASE_ARGS} --partition-name=boot_a                --size=64M  --img-file=boot.img
     ${PARTED_TOOL} add_partition ${BASE_ARGS} --partition-name=boot_b                --size=64M
     ${PARTED_TOOL} add_image     ${BASE_ARGS} --partition-name=vendor_boot_a         --size=32M  --img-file=vendor_boot.img

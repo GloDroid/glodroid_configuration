@@ -76,3 +76,6 @@ PRODUCT_PACKAGES += \
     update_engine_sideload \
 
 TARGET_FLATTEN_APEX := true
+
+# ro.frp.pst points to a partition that contains factory reset protection information.
+PRODUCT_VENDOR_PROPERTIES += ro.frp.pst=/dev/block/by-name/frp

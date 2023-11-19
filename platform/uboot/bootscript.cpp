@@ -29,6 +29,7 @@ EXTENV(partitions, ";name=bootloader,start=128K,size=130944K,uuid=\${uuid_gpt_bo
 #endif
 EXTENV(partitions, ";name=uboot-env,size=512K,uuid=\${uuid_gpt_reserved}")
 EXTENV(partitions, ";name=misc,size=512K,uuid=\${uuid_gpt_misc}")
+EXTENV(partitions, ";name=frp,size=512K,uuid=\${uuid_gpt_frp}")
 EXTENV(partitions, ";name=boot_a,size=64M,uuid=\${uuid_gpt_boot_a}")
 EXTENV(partitions, ";name=boot_b,size=64M,uuid=\${uuid_gpt_boot_b}")
 EXTENV(partitions, ";name=vendor_boot_a,size=32M,uuid=\${uuid_gpt_vendor_boot_a}")

@@ -17,3 +17,6 @@ subsystem usbmisc
 
 # USB Gadget HAL v1.2
 /sys/class/udc*                          current_speed 0644    system       system
+
+# Storage: for factory reset protection feature
+/dev/block/by-name/frp                                 0660    system       system
