@@ -19,6 +19,7 @@ set -x
 ./fastboot flash bootloader      bootloader__SUFFIX__.img
 ./fastboot flash uboot-env       env.img
 ./fastboot flash boot            boot.img
+./fastboot flash init_boot       init_boot.img
 ./fastboot flash vendor_boot     vendor_boot.img
 ./fastboot flash dtbo_a          boot_dtbo.img
 ./fastboot flash vbmeta_a        vbmeta.img

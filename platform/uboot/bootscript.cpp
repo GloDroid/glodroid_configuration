@@ -32,6 +32,8 @@ EXTENV(partitions, ";name=misc,size=512K,uuid=\${uuid_gpt_misc}")
 EXTENV(partitions, ";name=frp,size=512K,uuid=\${uuid_gpt_frp}")
 EXTENV(partitions, ";name=boot_a,size=64M,uuid=\${uuid_gpt_boot_a}")
 EXTENV(partitions, ";name=boot_b,size=64M,uuid=\${uuid_gpt_boot_b}")
+EXTENV(partitions, ";name=init_boot_a,size=8M,uuid=\${uuid_gpt_init_boot_a}")
+EXTENV(partitions, ";name=init_boot_b,size=8M,uuid=\${uuid_gpt_init_boot_b}")
 EXTENV(partitions, ";name=vendor_boot_a,size=32M,uuid=\${uuid_gpt_vendor_boot_a}")
 EXTENV(partitions, ";name=vendor_boot_b,size=32M,uuid=\${uuid_gpt_vendor_boot_b}")
 EXTENV(partitions, ";name=dtbo_a,size=8M,uuid=\${uuid_gpt_dtbo_a}")
@@ -121,7 +123,7 @@ FUNC_BEGIN(bootcmd_start)
  then
   FEXTENV(bootargs, " androidboot.force_normal_boot=1") ;
  fi;
- abootimg addr \$loadaddr \$vloadaddr
+ abootimg addr \$loadaddr \$vloadaddr \$iloadaddr
 
  adtimg addr \${dtboaddr}
 #ifdef DEVICE_HANDLE_FDT
@@ -164,6 +166,9 @@ FUNC_BEGIN(bootcmd_block)
  part start mmc \$mmc_bootdev boot_\$slot_name boot_start &&
  part size  mmc \$mmc_bootdev boot_\$slot_name boot_size
 
+ part start mmc \$mmc_bootdev init_boot_\$slot_name init_boot_start &&
+ part size  mmc \$mmc_bootdev init_boot_\$slot_name init_boot_size
+
  part start mmc \$mmc_bootdev vendor_boot_\$slot_name vendor_boot_start &&
  part size  mmc \$mmc_bootdev vendor_boot_\$slot_name vendor_boot_size
 
@@ -172,6 +177,7 @@ FUNC_BEGIN(bootcmd_block)
 
  mmc dev \$mmc_bootdev &&
  mmc read \$loadaddr \$boot_start \$boot_size
+ mmc read \$iloadaddr \$init_boot_start \$init_boot_size
  mmc read \$vloadaddr \$vendor_boot_start \$vendor_boot_size
  mmc read \$dtboaddr \$dtbo_start \$dtbo_size
 FUNC_END()
