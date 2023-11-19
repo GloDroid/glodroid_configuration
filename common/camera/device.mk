@@ -16,7 +16,7 @@ PRODUCT_PACKAGES += \
     camera.libcamera libcamera libcamera-base libcamera-cam lc-compliance \
     android.hardware.camera.provider@2.5-service_64 \
 
-PRODUCT_PROPERTY_OVERRIDES += ro.hardware.camera=libcamera
+PRODUCT_VENDOR_PROPERTIES += ro.hardware.camera=libcamera
 
 PRODUCT_COPY_FILES +=  \
     frameworks/native/data/etc/android.hardware.camera.concurrent.xml:$(TARGET_COPY_OUT_VENDOR)/etc/permissions/android.hardware.camera.concurrent.xml \

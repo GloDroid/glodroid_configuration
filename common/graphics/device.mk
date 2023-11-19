@@ -25,7 +25,7 @@ PRODUCT_PACKAGES += \
     android.hardware.graphics.composer@2.4-service \
     hwcomposer.drm_gd \
 
-PRODUCT_PROPERTY_OVERRIDES += ro.hardware.hwcomposer=drm_gd
+PRODUCT_VENDOR_PROPERTIES += ro.hardware.hwcomposer=drm_gd
 else
 PRODUCT_PACKAGES += \
     android.hardware.composer.hwc3-service.rs \
@@ -42,5 +42,5 @@ PRODUCT_PACKAGES += \
 ##
 
 GD_LCD_DENSITY ?= 160
-PRODUCT_PROPERTY_OVERRIDES += \
+PRODUCT_VENDOR_PROPERTIES += \
     ro.sf.lcd_density=$(GD_LCD_DENSITY) \

@@ -1,6 +1,6 @@
 # Add wifi-related packages
 PRODUCT_PACKAGES += libwpa_client wpa_supplicant hostapd wificond
-PRODUCT_PROPERTY_OVERRIDES += wifi.interface=wlan0 \
+PRODUCT_VENDOR_PROPERTIES += wifi.interface=wlan0 \
                               wifi.supplicant_scan_interval=15 \
 
 PRODUCT_COPY_FILES += \

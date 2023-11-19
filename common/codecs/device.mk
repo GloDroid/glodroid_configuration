@@ -45,5 +45,5 @@ PRODUCT_COPY_FILES += \
 #   If ION is chosen, then the mask should be 0xf50000
 #   If GRALLOC is chosen, then the mask should be 0xf60000
 #   If BLOB is chosen, then the mask should be 0xfc0000
-PRODUCT_PROPERTY_OVERRIDES += \
+PRODUCT_VENDOR_PROPERTIES += \
     debug.stagefright.c2-poolmask=0x0c0000 \

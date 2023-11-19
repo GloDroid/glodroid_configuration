@@ -20,7 +20,7 @@ YAGI represents a shared library with 3 symbols:
 
 Selecting YAGI require setting sysprop in device.mk file, e.g.:
 
-    PRODUCT_PROPERTY_OVERRIDES += vendor.hwc.drm.yagi.lib=libyagi_abc.so
+    PRODUCT_VENDOR_PROPERTIES += vendor.hwc.drm.yagi.lib=libyagi_abc.so
 
 YAGI smooth transition is planned to be accomplished in 4 steps:
 1. Merge YAGI support into drm_hwcomposer.
