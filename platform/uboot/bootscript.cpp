@@ -69,7 +69,7 @@ FUNC_BEGIN(enter_fastboot)
 FUNC_END()
 
 FUNC_BEGIN(bootcmd_bcb)
- ab_test slot_name mmc \${mmc_bootdev}#misc || run enter_fastboot ;
+ ab_select slot_name mmc \${mmc_bootdev}#misc --no-dec || run enter_fastboot ;
 
  bcb load $mmc_bootdev misc ;
  /* Handle $ adb reboot bootloader */
