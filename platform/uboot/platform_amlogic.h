@@ -2,10 +2,6 @@
 
 #define PLATFORM_SETUP_ENV() \
  setenv dtbaddr 0x5000000;   \
- setenv loadaddr 0x1000000;  \
- setenv vloadaddr 0x6000000; \
- setenv iloadaddr 0x8000000; \
- setenv dtboaddr 0x4000000;  \
 
 #define PLATFORM_HANDLE_FDT() \
  adtimg get dt --id=\$main_fdt_id dtb_start dtb_size main_fdt_index && \

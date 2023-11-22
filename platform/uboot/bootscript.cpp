@@ -123,9 +123,9 @@ FUNC_BEGIN(bootcmd_start)
  then
   FEXTENV(bootargs, " androidboot.force_normal_boot=1") ;
  fi;
- abootimg addr \$loadaddr \$vloadaddr \$iloadaddr
+ abootimg addr \$abootimg_boot_ptr \$abootimg_vendor_boot_ptr \$abootimg_init_boot_ptr
 
- adtimg addr \${dtboaddr}
+ adtimg addr \$abootimg_dtbo_ptr
 #ifdef DEVICE_HANDLE_FDT
  DEVICE_HANDLE_FDT()
 #endif
@@ -138,15 +138,15 @@ FUNC_BEGIN(bootcmd_start)
 #ifdef platform_broadcom
 #endif
  adtimg get dt --id=\$overlay_fdt_id dtb_start dtb_size overlay_fdt_index &&
- cp.b \$dtb_start \$dtboaddr \$dtb_size &&
+ cp.b \$dtb_start \$abootimg_dtbo_ptr \$dtb_size &&
  fdt resize 8192 &&
 #ifdef POSTPROCESS_FDT
  POSTPROCESS_FDT()
 #endif
- fdt apply \$dtboaddr &&
+ fdt apply \$abootimg_dtbo_ptr &&
  FEXTENV(bootargs, " androidboot.dtbo_idx=\${main_fdt_index},\${overlay_fdt_index}") ;
  /* START KERNEL */
- bootm \$loadaddr
+ bootm \$abootimg_boot_ptr
  /* Should never get here */
 FUNC_END()
 
@@ -163,23 +163,10 @@ FUNC_BEGIN(bootcmd_block)
   run bootcmd_avb;
  fi;
 
- part start mmc \$mmc_bootdev boot_\$slot_name boot_start &&
- part size  mmc \$mmc_bootdev boot_\$slot_name boot_size
-
- part start mmc \$mmc_bootdev init_boot_\$slot_name init_boot_start &&
- part size  mmc \$mmc_bootdev init_boot_\$slot_name init_boot_size
-
- part start mmc \$mmc_bootdev vendor_boot_\$slot_name vendor_boot_start &&
- part size  mmc \$mmc_bootdev vendor_boot_\$slot_name vendor_boot_size
-
- part start mmc \$mmc_bootdev dtbo_\$slot_name dtbo_start &&
- part size  mmc \$mmc_bootdev dtbo_\$slot_name dtbo_size
-
- mmc dev \$mmc_bootdev &&
- mmc read \$loadaddr \$boot_start \$boot_size
- mmc read \$iloadaddr \$init_boot_start \$init_boot_size
- mmc read \$vloadaddr \$vendor_boot_start \$vendor_boot_size
- mmc read \$dtboaddr \$dtbo_start \$dtbo_size
+ abootimg load mmc \$mmc_bootdev boot        \$slot_name
+ abootimg load mmc \$mmc_bootdev init_boot   \$slot_name
+ abootimg load mmc \$mmc_bootdev vendor_boot \$slot_name
+ abootimg load mmc \$mmc_bootdev dtbo        \$slot_name
 FUNC_END()
 
 FUNC_BEGIN(rename_and_expand_userdata_placeholder)

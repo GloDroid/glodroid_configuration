@@ -2,9 +2,6 @@
 
 #define PLATFORM_SETUP_ENV() \
  setenv dtbaddr 0x1fa00000;   \
- setenv loadaddr 0x10008000;  \
- setenv vloadaddr 0x13008000; \
- setenv dtboaddr 0x12008000;  \
 
 #define BOOTLOADER_PARTITION_OVERRIDE() \
  EXTENV(partitions, ";name=bootloader,start=32K,size=131040K,uuid=\${uuid_gpt_bootloader}")
