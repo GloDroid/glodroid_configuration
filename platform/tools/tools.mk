@@ -24,7 +24,6 @@ DEPLOY_FILES := \
 	$(PRODUCT_OUT)/flash-sd.sh \
 	$(PRODUCT_OUT)/deploy-sd.img \
 	$(PRODUCT_OUT)/boot.img \
-	$(PRODUCT_OUT)/boot_dtbo.img \
 	$(PRODUCT_OUT)/init_boot.img \
 	$(PRODUCT_OUT)/vendor_boot.img \
 	$(PRODUCT_OUT)/super.img \

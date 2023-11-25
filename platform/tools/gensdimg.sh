@@ -78,8 +78,6 @@ gen_image() {
     ${PARTED_TOOL} add_partition ${BASE_ARGS} --partition-name=init_boot_b           --size=8M
     ${PARTED_TOOL} add_image     ${BASE_ARGS} --partition-name=vendor_boot_a         --size=32M  --img-file=vendor_boot.img
     ${PARTED_TOOL} add_partition ${BASE_ARGS} --partition-name=vendor_boot_b         --size=32M
-    ${PARTED_TOOL} add_image     ${BASE_ARGS} --partition-name=dtbo_a                --size=8M   --img-file=boot_dtbo.img
-    ${PARTED_TOOL} add_partition ${BASE_ARGS} --partition-name=dtbo_b                --size=8M
     ${PARTED_TOOL} add_image     ${BASE_ARGS} --partition-name=vbmeta_a              --size=512K --img-file=vbmeta.img
     ${PARTED_TOOL} add_partition ${BASE_ARGS} --partition-name=vbmeta_b              --size=512K
     ${PARTED_TOOL} add_image     ${BASE_ARGS} --partition-name=vbmeta_system_a       --size=512K --img-file=vbmeta_system.img

@@ -16,8 +16,7 @@ PLATFORM_SETUP_ENV()
 #error PLATFORM_SETUP_ENV is not defined
 #endif
 
-setenv    main_fdt_id 0x100
-setenv overlay_fdt_id 0xFFF
+setenv dtb_index 0x0
 
 /* EMMC cards have 512k erase block size. Align partitions accordingly to avoid issues with erasing. */
 
@@ -36,8 +35,6 @@ EXTENV(partitions, ";name=init_boot_a,size=8M,uuid=\${uuid_gpt_init_boot_a}")
 EXTENV(partitions, ";name=init_boot_b,size=8M,uuid=\${uuid_gpt_init_boot_b}")
 EXTENV(partitions, ";name=vendor_boot_a,size=32M,uuid=\${uuid_gpt_vendor_boot_a}")
 EXTENV(partitions, ";name=vendor_boot_b,size=32M,uuid=\${uuid_gpt_vendor_boot_b}")
-EXTENV(partitions, ";name=dtbo_a,size=8M,uuid=\${uuid_gpt_dtbo_a}")
-EXTENV(partitions, ";name=dtbo_b,size=8M,uuid=\${uuid_gpt_dtbo_b}")
 EXTENV(partitions, ";name=vbmeta_a,size=512K,uuid=\${uuid_gpt_vbmeta_a}")
 EXTENV(partitions, ";name=vbmeta_b,size=512K,uuid=\${uuid_gpt_vbmeta_b}")
 EXTENV(partitions, ";name=vbmeta_system_a,size=512K,uuid=\${uuid_gpt_vbmeta_system_a}")
@@ -125,7 +122,6 @@ FUNC_BEGIN(bootcmd_start)
  fi;
  abootimg addr \$abootimg_boot_ptr \$abootimg_vendor_boot_ptr \$abootimg_init_boot_ptr
 
- adtimg addr \$abootimg_dtbo_ptr
 #ifdef DEVICE_HANDLE_FDT
  DEVICE_HANDLE_FDT()
 #endif
@@ -134,17 +130,9 @@ FUNC_BEGIN(bootcmd_start)
 #else
 #error PLATFORM_HANDLE_FDT is not defined
 #endif
-
-#ifdef platform_broadcom
-#endif
- adtimg get dt --id=\$overlay_fdt_id dtb_start dtb_size overlay_fdt_index &&
- cp.b \$dtb_start \$abootimg_dtbo_ptr \$dtb_size &&
- fdt resize 8192 &&
 #ifdef POSTPROCESS_FDT
  POSTPROCESS_FDT()
 #endif
- fdt apply \$abootimg_dtbo_ptr &&
- FEXTENV(bootargs, " androidboot.dtbo_idx=\${main_fdt_index},\${overlay_fdt_index}") ;
  /* START KERNEL */
  bootm \$abootimg_boot_ptr
  /* Should never get here */
@@ -159,7 +147,6 @@ FUNC_BEGIN(bootcmd_block)
  abootimg load mmc \$mmc_bootdev boot        \${slot_name}
  abootimg load mmc \$mmc_bootdev init_boot   \${slot_name}
  abootimg load mmc \$mmc_bootdev vendor_boot \${slot_name}
- abootimg load mmc \$mmc_bootdev dtbo        \${slot_name}
 
  if test STRESC(\$androidrecovery) = STRESC("true");
  then
