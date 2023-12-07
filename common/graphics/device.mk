@@ -16,7 +16,7 @@ PRODUCT_COPY_FILES += \
     $(LOCAL_PATH)/android.hardware.graphics.allocator@4.0-service.minigbm_gd.rc:$(TARGET_COPY_OUT_VENDOR)/etc/init/android.hardware.graphics.allocator@4.0-service.minigbm_gd.rc
 
 PRODUCT_COPY_FILES += \
-    frameworks/native/data/etc/android.software.opengles.deqp.level-2021-03-01.xml:$(TARGET_COPY_OUT_VENDOR)/etc/permissions/android.software.opengles.deqp.level.xml
+    frameworks/native/data/etc/android.software.opengles.deqp.level-2023-03-01.xml:$(TARGET_COPY_OUT_VENDOR)/etc/permissions/android.software.opengles.deqp.level.xml
 
 ifeq ($(GD_USE_RS_HWCOMPOSER),)
 # Composer passthrough HAL
