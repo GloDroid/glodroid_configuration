@@ -12,6 +12,8 @@ PRODUCT_PACKAGES += \
     libgallium_dri \
     libglapi \
 
+PRODUCT_VENDOR_PROPERTIES += ro.hardware.egl=mesa
+
 PRODUCT_COPY_FILES += \
     $(LOCAL_PATH)/android.hardware.graphics.allocator@4.0-service.minigbm_gd.rc:$(TARGET_COPY_OUT_VENDOR)/etc/init/android.hardware.graphics.allocator@4.0-service.minigbm_gd.rc
 
