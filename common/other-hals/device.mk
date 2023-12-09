@@ -36,7 +36,7 @@ endif
 ifeq ($(GD_NO_DEFAULT_USB),)
 PRODUCT_PACKAGES += \
     android.hardware.usb-service.example \
-    android.hardware.usb.gadget@1.2-glodroid-service \
+    android.hardware.usb.gadget-service.glodroid \
 
 PRODUCT_COPY_FILES += \
     frameworks/native/data/etc/android.hardware.usb.accessory.xml:$(TARGET_COPY_OUT_VENDOR)/etc/permissions/android.hardware.usb.accessory.xml \

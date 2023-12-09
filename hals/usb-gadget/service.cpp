@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2020 The Android Open Source Project
+ * Copyright (C) 2022 The Android Open Source Project
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,39 +14,18 @@
  * limitations under the License.
  */
 
-#define LOG_TAG "android.hardware.usb.gadget@1.2-glodroid-service"
-
-#include <hidl/HidlTransportSupport.h>
+#include <android-base/logging.h>
+#include <android/binder_manager.h>
+#include <android/binder_process.h>
 #include "UsbGadget.h"
 
-using android::sp;
-
-// libhwbinder:
-using android::hardware::configureRpcThreadpool;
-using android::hardware::joinRpcThreadpool;
-
-// Generated HIDL files
-using android::hardware::usb::gadget::V1_2::IUsbGadget;
-using android::hardware::usb::gadget::V1_2::implementation::UsbGadget;
-
-using android::OK;
-using android::status_t;
-
+using ::aidl::android::hardware::usb::gadget::UsbGadget;
 int main() {
-    configureRpcThreadpool(1, true /*callerWillJoin*/);
-
-    android::sp<IUsbGadget> service = new UsbGadget();
-
-    status_t status = service->registerAsService();
-
-    if (status != OK) {
-        ALOGE("Cannot register USB Gadget HAL service");
-        return 1;
-    }
-
-    ALOGI("USB Gadget HAL Ready.");
-    joinRpcThreadpool();
-    // Under noraml cases, execution will not reach this line.
-    ALOGI("USB Gadget HAL failed to join thread pool.");
-    return 1;
+    ABinderProcess_setThreadPoolMaxThreadCount(0);
+    std::shared_ptr<UsbGadget> usbgadget = ndk::SharedRefBase::make<UsbGadget>();
+    const std::string instance = std::string() + UsbGadget::descriptor + "/default";
+    binder_status_t status = AServiceManager_addService(usbgadget->asBinder().get(), instance.c_str());
+    CHECK(status == STATUS_OK);
+    ABinderProcess_joinThreadPool();
+    return -1;
 }
