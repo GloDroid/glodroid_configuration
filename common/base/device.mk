@@ -35,7 +35,7 @@ ifeq (,$(filter $(GD_LOWRAM_CONFIG),))
 $(call inherit-product, frameworks/native/build/tablet-10in-xhdpi-2048-dalvik-heap.mk)
 endif
 
-PRODUCT_SHIPPING_API_LEVEL := 33
+PRODUCT_SHIPPING_API_LEVEL := 34
 
 # Build and run only ART
 PRODUCT_RUNTIMES := runtime_libart_default
