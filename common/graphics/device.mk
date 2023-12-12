@@ -15,9 +15,6 @@ PRODUCT_PACKAGES += \
 PRODUCT_VENDOR_PROPERTIES += ro.hardware.egl=mesa
 
 PRODUCT_COPY_FILES += \
-    $(LOCAL_PATH)/android.hardware.graphics.allocator@4.0-service.minigbm_gd.rc:$(TARGET_COPY_OUT_VENDOR)/etc/init/android.hardware.graphics.allocator@4.0-service.minigbm_gd.rc
-
-PRODUCT_COPY_FILES += \
     frameworks/native/data/etc/android.software.opengles.deqp.level-2023-03-01.xml:$(TARGET_COPY_OUT_VENDOR)/etc/permissions/android.software.opengles.deqp.level.xml
 
 ifeq ($(GD_USE_RS_HWCOMPOSER),)
@@ -34,10 +31,14 @@ PRODUCT_PACKAGES += \
     android.hardware.composer.hwc3-rs.rc android.hardware.composer.hwc3-rs.xml
 endif
 
-## Composer HAL for gralloc4 + minigbm gralloc4
+## Minigbm/Gralloc5
 PRODUCT_PACKAGES += \
-    android.hardware.graphics.allocator@4.0-service.minigbm_gd \
+    android.hardware.graphics.allocator-service.minigbm_gd \
+    android.hardware.graphics.allocator_gd.rc \
+    android.hardware.graphics.allocator_gd.xml \
     android.hardware.graphics.mapper@4.0-impl.minigbm_gd \
+    mapper.minigbm_gd \
+    mapper.minigbm_gd.xml \
     libminigbm_gralloc_gd \
     libgbm_mesa_wrapper \
 
