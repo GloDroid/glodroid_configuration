@@ -122,12 +122,11 @@ BOARD_GLODROID_DYNAMIC_PARTITIONS_SIZE := $(shell echo $$(( $(BOARD_SUPER_PARTIT
 BOARD_GLODROID_DYNAMIC_PARTITIONS_PARTITION_LIST := system system_ext vendor product vendor_dlkm
 
 AB_OTA_UPDATER := true
-AB_OTA_PARTITIONS += boot init_boot system system_ext vendor product vendor_dlkm vendor_boot vbmeta vbmeta_system dtbo
+AB_OTA_PARTITIONS += boot init_boot system system_ext vendor product vendor_dlkm vendor_boot vbmeta vbmeta_system
 
 TARGET_RECOVERY_PIXEL_FORMAT := RGBX_8888
 
 # Kernel build rules
-BOARD_INCLUDE_RECOVERY_DTBO := true
 BOARD_INCLUDE_DTB_IN_BOOTIMG := true
 BOARD_BOOT_HEADER_VERSION := 4
 BOARD_INIT_BOOT_HEADER_VERSION := 4
