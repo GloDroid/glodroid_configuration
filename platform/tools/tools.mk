@@ -65,6 +65,12 @@ $(PRODUCT_OUT)/sdcard.img: $(GENSDIMG) $(PARTED) $(DEPLOY_FILES)
 .PHONY: sdcard
 sdcard: $(PRODUCT_OUT)/sdcard.img
 
+$(PRODUCT_OUT)/sdcard.img.zip: $(PRODUCT_OUT)/sdcard.img
+	zip -u $@ $<
+
+.PHONY: sdcardzip
+sdcardzip: $(PRODUCT_OUT)/sdcard.img.zip
+
 $(PRODUCT_OUT)/images.tar.gz: $(DEPLOY_FILES)
 	cp $(DEPLOY_TOOLS) $(PRODUCT_OUT)
 	tar -C$(PRODUCT_OUT) -czvf $@ $(notdir $^)
