@@ -57,7 +57,7 @@ $(KERNEL_TARGET): $(KERNEL_DEFCONFIG) $(KERNEL_FRAGMENTS) $(KERNEL_SRC_FILES) $(
 		$(KERNEL_OUT)/project_specific.mk
 
 # Disable interposer and use LLVM compiler toolchain from AOSP tree
-	export ETC$$(cat /etc/environment) && export PATH=$(AOSP_ABSOLUTE_PATH)/$(LLVM_PREBUILTS_PATH):$(RUST_BIN_DIR_ABS):$$ETCPATH:$$PATH && make -C $(KERNEL_OUT) install
+	export PATH=$(RUST_BIN_DIR_ABS):$(AOSP_ABSOLUTE_PATH)/$(LLVM_PREBUILTS_PATH):$$(cat $(OUT_DIR)/.path_interposer_origpath) && make -C $(KERNEL_OUT) install
 
 # Post processing:
 
