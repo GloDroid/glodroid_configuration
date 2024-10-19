@@ -18,13 +18,11 @@ PRODUCT_COPY_FILES += \
     frameworks/native/data/etc/android.software.opengles.deqp.level-2023-03-01.xml:$(TARGET_COPY_OUT_VENDOR)/etc/permissions/android.software.opengles.deqp.level.xml
 
 ifeq ($(GD_USE_RS_HWCOMPOSER),)
-# Composer passthrough HAL
 PRODUCT_PACKAGES += \
-    android.hardware.graphics.composer@2.4-impl \
-    android.hardware.graphics.composer@2.4-service \
-    hwcomposer.drm_gd \
+    android.hardware.composer.hwc3-service.drm_aospext
 
-PRODUCT_VENDOR_PROPERTIES += ro.hardware.hwcomposer=drm_gd
+    DEVICE_MANIFEST_FILE += glodroid/configuration/common/graphics/android.hardware.graphics.composer@3.xml
+    PRODUCT_COPY_FILES += glodroid/configuration/common/graphics/android.hardware.graphics.composer@3.rc:$(TARGET_COPY_OUT_VENDOR)/etc/init/android.hardware.graphics.composer@3.rc
 else
 PRODUCT_PACKAGES += \
     android.hardware.composer.hwc3-service.rs \
