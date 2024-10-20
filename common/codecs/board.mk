@@ -6,9 +6,6 @@
 
 BCDC_PATH := $(patsubst $(CURDIR)/%,%,$(dir $(abspath $(lastword $(MAKEFILE_LIST)))))
 
-BOARD_BUILD_AOSPEXT_DAV1D := true
-BOARD_DAV1D_SRC_DIR := glodroid/vendor/dav1d
-
 BOARD_BUILD_AOSPEXT_FFMPEG := true
 BOARD_FFMPEG_SRC_DIR := glodroid/vendor/ffmpeg
 
