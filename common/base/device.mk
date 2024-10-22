@@ -18,6 +18,9 @@ ifneq ($(filter $(TARGET_ARCH),arm64 x86_64),)
     $(call inherit-product, $(SRC_TARGET_DIR)/product/core_64_bit.mk)
 endif
 
+# Enable updating of APEXes
+$(call inherit-product, $(SRC_TARGET_DIR)/product/updatable_apex.mk)
+
 # Enable userspace reboot
 $(call inherit-product, $(SRC_TARGET_DIR)/product/userspace_reboot.mk)
 
