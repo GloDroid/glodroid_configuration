@@ -77,6 +77,7 @@ PRODUCT_PACKAGES += \
     update_engine_client \
     update_verifier \
     update_engine_sideload \
+    com.android.hardware.boot \
 
 # ro.frp.pst points to a partition that contains factory reset protection information.
 PRODUCT_VENDOR_PROPERTIES += ro.frp.pst=/dev/block/by-name/frp
