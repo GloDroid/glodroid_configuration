@@ -178,3 +178,6 @@ BOARD_USES_GLODROID_MAKE_TARGETS := true
 BOARD_BUILD_GLODROID_KERNEL := true
 
 RUST_BIN_DIR := prebuilts/rust/linux-x86/1.68.0/bin
+
+# vendor_dlkm is not yet ready for files filtering
+BUILD_BROKEN_INCORRECT_PARTITION_IMAGES := true
