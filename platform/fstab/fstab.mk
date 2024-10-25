@@ -6,7 +6,7 @@ LOCAL_PATH := $(call my-dir)
 
 FSTAB_RAW := $(LOCAL_PATH)/fstab.cpp
 RECOVERY_FSTAB := $(TARGET_VENDOR_RAMDISK_OUT)/first_stage_ramdisk/fstab.$(TARGET_PRODUCT)
-VENDOR_FSTAB := $(TARGET_OUT_VENDOR)/etc/fstab.$(TARGET_PRODUCT)
+VENDOR_FSTAB := $(TARGET_OUT_VENDOR)/etc/fstab
 
 TARGET_RECOVERY_FSTAB := $(RECOVERY_FSTAB)
 
@@ -21,7 +21,7 @@ include $(CLEAR_VARS)
 
 # ---------------------------------------------------------------------------
 
-LOCAL_MODULE := fstab
+LOCAL_MODULE := fstab.$(TARGET_PRODUCT)
 
 LOCAL_PROPRIETARY_MODULE := true
 LOCAL_MODULE_PATH := $(TARGET_OUT_VENDOR)/etc/

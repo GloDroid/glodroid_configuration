@@ -50,7 +50,7 @@ PRODUCT_COPY_FILES += \
     $(LOCAL_PATH)/ueventd.common.rc:$(TARGET_COPY_OUT_VENDOR)/etc/ueventd.rc \
     $(LOCAL_PATH)/fstab.zram:$(TARGET_COPY_OUT_VENDOR)/etc/fstab.zram \
 
-PRODUCT_PACKAGES += fstab
+PRODUCT_PACKAGES += fstab.$(TARGET_PRODUCT)
 
 PRODUCT_COPY_FILES += \
     frameworks/native/data/etc/android.software.opengles.deqp.level-2021-03-01.xml:$(TARGET_COPY_OUT_VENDOR)/etc/permissions/android.software.opengles.deqp.level.xml
