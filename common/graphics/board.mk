@@ -24,7 +24,4 @@ BOARD_BUILD_AOSPEXT_MINIGBM := true
 BOARD_MINIGBM_SRC_DIR := glodroid/vendor/minigbm
 BOARD_MINIGBM_PATCHES_DIRS += $(BCG_PATH)/patches-minigbm
 
-DEVICE_MANIFEST_FILE += \
-    $(BCG_PATH)/android.hardware.graphics.mapper@4.0.xml \
-
 BOARD_VENDOR_SEPOLICY_DIRS       += $(BCG_PATH)/sepolicy/vendor

@@ -34,7 +34,6 @@ PRODUCT_PACKAGES += \
     android.hardware.graphics.allocator-service.minigbm_gd \
     android.hardware.graphics.allocator_gd.rc \
     android.hardware.graphics.allocator_gd.xml \
-    android.hardware.graphics.mapper@4.0-impl.minigbm_gd \
     mapper.minigbm_gd \
     mapper.minigbm_gd.xml \
     libminigbm_gralloc_gd \
