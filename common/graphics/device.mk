@@ -39,6 +39,7 @@ PRODUCT_PACKAGES += \
     mapper.minigbm_gd.xml \
     libminigbm_gralloc_gd \
     libgbm_mesa_wrapper \
+    dri_gbm \
 
 ##
 
