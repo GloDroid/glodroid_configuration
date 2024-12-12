@@ -68,7 +68,7 @@ DTB_OUTPUT		:= $(PRODUCT_OUT)/dtb.img
 
 $(TARGET_VENDOR_MODULES)/modules.dep: $(KERNEL_TARGET)
 	rm -rf $(TARGET_VENDOR_MODULES)/kernel
-	rm -f $(TARGET_VENDOR_MODULES)/modules.*
+	ls $(TARGET_VENDOR_MODULES)/modules.* | grep -v modules.blocklist | xargs rm -f
 	mkdir -p $(TARGET_VENDOR_MODULES)/kernel
 	cp -r $(KERNEL_OUT)/install/modules/lib/modules/GloDroid/kernel/* $(TARGET_VENDOR_MODULES)/kernel/
 	cp -r $(KERNEL_OUT)/install/modules/lib/modules/GloDroid/modules.* $(TARGET_VENDOR_MODULES)/
