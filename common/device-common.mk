@@ -3,8 +3,7 @@ ifneq (,$(filter %_tv,$(TARGET_PRODUCT)))
     GD_NO_DEFAULT_MODEM := true
     $(call inherit-product, $(LOCAL_PATH)/device-tv.mk)
 else ifneq (,$(filter %_auto,$(TARGET_PRODUCT)))
-# TODO: Implement
-    $(call inherit-product, $(SRC_TARGET_DIR)/product/full_base.mk)
+    $(call inherit-product, $(LOCAL_PATH)/device-car.mk)
 else
 ifeq ($(wildcard lineage),lineage)
     $(call inherit-product, vendor/lineage/config/common_full_phone.mk)
